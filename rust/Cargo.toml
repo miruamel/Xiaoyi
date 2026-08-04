@@ -1,0 +1,118 @@
+[package]
+name = "xiaoyi-rust"
+version = "0.1.0"
+edition = "2021"
+description = "Xiaoyi polyglot framework - Rust core with deep vertical architecture"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/miruamel/Xiaoyi"
+homepage = "https://github.com/miruamel/Xiaoyi"
+documentation = "https://docs.rs/xiaoyi-rust"
+keywords = ["ai", "llm", "agent", "workflow", "framework"]
+categories = ["science", "command-line-utilities"]
+rust-version = "1.75"
+
+[dependencies]
+# Async runtime and utilities
+tokio = { version = "1.35", features = ["full"] }
+async-trait = "0.1"
+futures = "0.3"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Logging and tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# CLI
+clap = { version = "4.4", features = ["derive"] }
+
+# HTTP/API
+reqwest = { version = "0.11", features = ["json", "stream"] }
+axum = "0.7"
+tonic = { version = "0.11", features = ["tls", "transport"] }
+prost = "0.12"
+
+# gRPC utilities
+tonic-build = "0.11"
+
+# Data structures
+indexmap = { version = "2.0", features = ["serde"] }
+petgraph = "0.6"
+rustc-hash = "1.1"
+dashmap = "5.5"
+
+# Database
+sqlx = { version = "0.7", features = ["runtime-tokio", "sqlite", "postgres", "chrono"] }
+rusqlite = { version = "0.30", features = ["bundled"] }
+
+# Graph algorithms
+petgraph = "0.6"
+networkx = "0.3"
+
+# Message queue
+lapin = "2.3"
+redis = { version = "0.24", features = ["tokio-comp", "connection-manager"] }
+
+# Utilities
+uuid = { version = "1.6", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+rand = "0.8"
+regex = "1.10"
+lazy_static = "1.4"
+parking_lot = "0.12"
+dotenvy = "0.15"
+
+# Cryptography
+sha2 = "0.10"
+hmac = "0.12"
+base64 = "0.22"
+
+# Code generation
+inkwell = { version = "0.4", features = ["llvm15-0"] }
+llvm-sys = "150"
+
+# WebAssembly
+wasmer = "3.1"
+wasmtime = "11.0"
+
+# Terminal UI
+ratatui = "0.24"
+crossterm = "0.27"
+
+# Configuration
+config = "0.13"
+dotenv = "0.15"
+
+# Validation
+validator = "0.16"
+
+# HTTP client for tools
+reqwest = { version = "0.11", features = ["json", "multipart", "stream"] }
+url = "2.5"
+
+# GraphQL
+graphql_client = "0.13"
+
+# Retry and resilience
+backoff = { version = "0.4", features = ["tokio"] }
+
+# Ollama
+ollag = "0.3"
+
+[build-dependencies]
+tonic-build = "0.11"
+prost-build = "0.12"
+
+# Workspace configuration
+[workspace]
+resolver = "2"
+members = []
+default-members = []
+exclude = ["pyapps", "fuzz", "benches", "examples"]
