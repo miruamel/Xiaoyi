@@ -1,0 +1,56 @@
+# Configuration for GitHub Actions stale bot
+# See https://github.com/actions/stale
+
+# Number of days of inactivity before an issue/PR becomes stale
+days-before-stale: 60
+
+# Number of days of inactivity before a stale issue/PR is closed
+days-before-close: 7
+
+# Issues/PRs with these labels will never be considered stale
+exempt-labels:
+  - "pinned"
+  - "security"
+  - "blocked"
+  - "wontfix"
+  - "documentation"
+
+# Label to apply when marking as stale
+stale-label: "stale"
+
+# Comment to post when marking as stale
+mark-comment: >
+  This issue/PR has been automatically marked as stale because it has not had recent activity.
+  It will be closed in 7 days if no further activity occurs.
+  Thank you for your contributions!
+
+# Comment to post when closing a stale issue/PR
+close-comment: >
+  This issue/PR has been automatically closed due to inactivity.
+  Feel free to reopen if you'd like to continue working on it.
+
+# Only check issues/PRs updated in the last 30 days (to avoid mass-staling old items)
+only: "all"
+
+# Limit the number of items to process per run (0 = unlimited)
+limit-per-run: 30
+
+# Skip issues/PRs with assignees
+skip-assignees: false
+
+# Skip issues/PRs with milestones
+skip-milestones: false
+
+# Skip draft PRs
+skip-draft: true
+
+# Operations to perform
+operations-per-run: 30
+
+# Start date for stale calculation (ISO 8601)
+# start-date: "2024-01-01"
+
+# GitHub token permissions (handled by workflow)
+# permissions:
+#   issues: write
+#   pull-requests: write

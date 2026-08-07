@@ -1,0 +1,292 @@
+name: Scheduled Checks
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+    # Run weekly on Sunday at 3 AM UTC
+    - cron: '0 3 * * 0'
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+env:
+  RUSTFLAGS: "-D warnings"
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # Nightly Rust build to catch regressions early
+  rust-nightly:
+    name: Rust Nightly
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' && github.event.schedule == '0 2 * * *'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust nightly
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            src/rust/target
+          key: ${{ runner.os }}-cargo-nightly-${{ hashFiles('src/rust/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-nightly-
+
+      - name: Check formatting
+        run: cd src/rust && cargo fmt --all -- --check
+
+      - name: Run clippy
+        run: cd src/rust && cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Build
+        run: cd src/rust && cargo build --all-targets --all-features
+
+      - name: Run tests
+        run: cd src/rust && cargo test --all-targets --all-features
+
+      - name: Run doctests
+        run: cd src/rust && cargo test --doc --all-features
+
+  # Weekly comprehensive check
+  weekly-comprehensive:
+    name: Weekly Comprehensive
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' && github.event.schedule == '0 3 * * 0'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            src/rust/target
+          key: ${{ runner.os }}-cargo-weekly-${{ hashFiles('src/rust/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-weekly-
+
+      - name: Check formatting
+        run: cd src/rust && cargo fmt --all -- --check
+
+      - name: Run clippy
+        run: cd src/rust && cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Build all targets
+        run: cd src/rust && cargo build --all-targets --all-features
+
+      - name: Run all tests
+        run: cd src/rust && cargo test --all-targets --all-features
+
+      - name: Run benchmarks (compile only)
+        run: cd src/rust && cargo bench --all-features --no-run
+
+      - name: Check documentation
+        run: cd src/rust && cargo doc --all-features --no-deps --document-private-items
+
+      - name: Audit dependencies
+        run: |
+          cargo install cargo-audit --locked
+          cd src/rust && cargo audit
+
+      - name: Check for outdated dependencies
+        run: |
+          cargo install cargo-outdated --locked
+          cd src/rust && cargo outdated --root-deps-only || true
+
+  # Python weekly check
+  python-weekly:
+    name: Python Weekly
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' && github.event.schedule == '0 3 * * 0'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: src/python/pyproject.toml
+
+      - name: Install dependencies
+        run: |
+          cd src/python
+          pip install -e ".[dev]"
+
+      - name: Check formatting
+        run: |
+          cd src/python
+          ruff format --check .
+
+      - name: Run linter
+        run: |
+          cd src/python
+          ruff check .
+
+      - name: Type check
+        run: |
+          cd src/python
+          mypy xiaoyi --strict
+
+      - name: Run tests
+        run: |
+          cd src/python
+          pytest -v --tb=short
+
+      - name: Check for outdated dependencies
+        run: |
+          cd src/python
+          pip list --outdated --format=json | jq -r '.[] | "\(.name) \(.version) -> \(.latest_version)"' || true
+
+  # TypeScript weekly check
+  typescript-weekly:
+    name: TypeScript Weekly
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' && github.event.schedule == '0 3 * * 0'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: src/typescript/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd src/typescript
+          npm ci
+
+      - name: Check formatting
+        run: |
+          cd src/typescript
+          npm run format:check
+
+      - name: Run linter
+        run: |
+          cd src/typescript
+          npm run lint
+
+      - name: Type check
+        run: |
+          cd src/typescript
+          npm run typecheck
+
+      - name: Run tests
+        run: |
+          cd src/typescript
+          npm run test -- --run
+
+      - name: Build
+        run: |
+          cd src/typescript
+          npm run build
+
+      - name: Check for outdated dependencies
+        run: |
+          cd src/typescript
+          npm outdated || true
+
+  # Security audit (runs weekly)
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' && github.event.schedule == '0 3 * * 0'
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run security audit (Rust)
+        run: |
+          cargo install cargo-audit --locked
+          cd src/rust && cargo audit --json > audit-results.json || true
+
+      - name: Upload Rust audit results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: src/rust/audit-results.json
+          category: rust-audit
+
+      - name: Run security audit (Python)
+        run: |
+          pip install pip-audit
+          cd src/python && pip-audit --format json --output audit-results.json || true
+
+      - name: Upload Python audit results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: src/python/audit-results.json
+          category: python-audit
+
+      - name: Run security audit (TypeScript)
+        run: |
+          cd src/typescript
+          npm audit --json > audit-results.json || true
+
+      - name: Upload TypeScript audit results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: src/typescript/audit-results.json
+          category: typescript-audit
+
+  # Dependency review (runs on schedule)
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          config-file: '.github/dependency-review.yml'
+          fail-on-severity: high
+
+  # Notify on failures
+  notify-on-failure:
+    name: Notify on Failure
+    runs-on: ubuntu-latest
+    needs:
+      - rust-nightly
+      - weekly-comprehensive
+      - python-weekly
+      - typescript-weekly
+      - security-audit
+      - dependency-review
+    if: failure()
+    steps:
+      - name: Send failure notification
+        run: |
+          echo "Scheduled workflow failed. Check GitHub Actions for details."
+          echo "Workflow: ${{ github.workflow }}"
+          echo "Run: ${{ github.run_id }}"
+          # Add custom notification logic here (Slack, email, etc.)

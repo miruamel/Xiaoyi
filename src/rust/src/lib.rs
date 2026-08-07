@@ -31,16 +31,24 @@ mod nodejs_bindings;
 
 // Re-exports
 pub use xiaoyi::core::config::{Config, ConfigBuilder, ConfigSource};
+pub use xiaoyi::core::config::source::file::FileSource;
+pub use xiaoyi::core::config::source::ConfigSource as AsyncConfigSource;
 pub use xiaoyi::core::error::{XiaoyiError, ErrorKind, Result};
 pub use xiaoyi::core::result::{Status, ResultExt};
 pub use xiaoyi::domain::token::{PrimitiveKind, IntKind, IntWidth, IntType, FloatKind, SyntaxKind};
+pub use xiaoyi::llm;
 pub use xiaoyi::llm::client::{LlmClient, ChatRequest, ChatResponse, ChatMessage, MessageRole, Usage};
+pub use xiaoyi::workflow;
 pub use xiaoyi::workflow::dag::{Dag, DagNode, DagEdge, DagGraph};
+pub use xiaoyi::workflow::dag::graph::{NodeId, NodeKind, EdgeKind};
 pub use xiaoyi::memory::stm::{StmCache, CacheEntry, CacheStats, LruCache};
 pub use xiaoyi::builder::AgentBuilder;
 pub use xiaoyi::orchestrator::Orchestrator;
 pub use xiaoyi::gateway::Gateway;
+pub use xiaoyi::lexer;
 pub use xiaoyi::lexer::Lexer;
+pub use xiaoyi::lexer::scanner::Scanner;
+pub use xiaoyi::lexer::token::Token;
 
 /// Initialize the runtime.
 ///
@@ -48,7 +56,7 @@ pub use xiaoyi::lexer::Lexer;
 /// @return Initialized runtime handle
 /// @since 0.1.0
 /// @threadsafe
-pub async fn init(config: Option<xiaoyi::core::config::Config>) -> Result<Runtime> {
+pub async fn init(config: Option<xiaoyi::core::config::Config>) -> xiaoyi::core::error::Result<Runtime> {
     let config = config.unwrap_or_default();
     tracing_subscriber::fmt::init();
     Ok(Runtime { config })
@@ -83,7 +91,7 @@ impl Runtime {
     /// Shutdown runtime.
     ///
     /// @since 0.1.0
-    pub async fn shutdown(self) -> Result<()> {
+    pub async fn shutdown(self) -> xiaoyi::core::error::Result<()> {
         Ok(())
     }
 }

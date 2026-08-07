@@ -68,8 +68,41 @@ tokio-test = "0.4"
 proptest = "1.4"
 criterion = { version = "0.5", features = ["html_reports"] }
 pretty_assertions = "1.4"
+tempfile = "3.10"
 
-# Nightly features
+[[bench]]
+name = "cache_bench"
+harness = false
+
+[[test]]
+name = "builder"
+path = "tests/builder.rs"
+
+[[test]]
+name = "orchestrator"
+path = "tests/orchestrator.rs"
+
+[[test]]
+name = "gateway"
+path = "tests/gateway.rs"
+
+[[test]]
+name = "lexer"
+path = "tests/lexer.rs"
+
+[[test]]
+name = "llm"
+path = "tests/llm.rs"
+
+[[test]]
+name = "integration_smoke"
+path = "tests/integration_smoke.rs"
+
+[[test]]
+name = "property_cache"
+path = "tests/property_cache.rs"
+
+ # Nightly features
 [profile.release]
 lto = "fat"
 codegen-units = 1

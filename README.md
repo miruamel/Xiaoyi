@@ -1,5 +1,14 @@
 # Xiaoyi
 
+[![CI](https://github.com/miruamel/Xiaoyi/actions/workflows/ci.yml/badge.svg)](https://github.com/miruamel/Xiaoyi/actions/workflows/ci.yml)
+[![Rust](https://img.shields.io/badge/rust-1.75%2B-orange.svg)](https://www.rust-lang.org)
+[![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org)
+[![TypeScript](https://img.shields.io/badge/typescript-5.0%2B-blue.svg)](https://www.typescriptlang.org)
+[![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-green.svg)](LICENSE)
+[![Crates.io](https://img.shields.io/crates/v/xiaoyi-rust.svg)](https://crates.io/crates/xiaoyi-rust)
+[![PyPI](https://img.shields.io/pypi/v/xiaoyi-py.svg)](https://pypi.org/project/xiaoyi-py/)
+[![npm](https://img.shields.io/npm/v/xiaoyi-ts.svg)](https://www.npmjs.com/package/xiaoyi-ts)
+
 **Polyglot AI Agent Framework with Deep Vertical Architecture**
 
 Xiaoyi is a multi-language (Rust, Python, TypeScript) framework for building LLM-powered agents, workflows, and orchestration systems. It features a **deep vertical architecture** with 7+ nested layers per domain, enabling fine-grained separation of concerns from token primitives to application orchestration.
@@ -197,11 +206,4 @@ Dual-licensed under **MIT OR Apache-2.0**.
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing`)
-3. Commit with conventional commits (`feat: add amazing thing`)
-4. Push and open a PR
-
-## Architecture Decision Records
-
-See [docs/arch/](docs/arch/) for ADRs documenting major architectural decisions.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.

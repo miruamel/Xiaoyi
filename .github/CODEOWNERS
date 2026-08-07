@@ -1,0 +1,36 @@
+# CODEOWNERS
+# See https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global owners - all files
+* @miruamel
+
+# Rust crate
+/src/rust/ @miruamel
+
+# Python SDK
+/src/python/ @miruamel
+
+# TypeScript SDK
+/src/typescript/ @miruamel
+
+# CI/CD workflows
+/.github/workflows/ @miruamel
+
+# Documentation
+/docs/ @miruamel
+/ARCHITECTURE.md @miruamel
+/README.md @miruamel
+
+# Configuration files
+/.github/dependabot.yml @miruamel
+/.github/stale.yml @miruamel
+/.pre-commit-config.yaml @miruamel
+/clippy.toml @miruamel
+/.markdownlint.json @miruamel
+/.yamllint.yml @miruamel
+
+# Security
+/SECURITY.md @miruamel
+
+# Release management
+/CHANGELOG.md @miruamel

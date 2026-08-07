@@ -82,6 +82,20 @@ impl FileSource {
         self
     }
 }
+fn flatten_json(value: &serde_json::Value, prefix: &str, out: &mut HashMap<String, serde_json::Value>) {
+    match value {
+        serde_json::Value::Object(map) => {
+            for (k, v) in map {
+                let new_prefix = if prefix.is_empty() { k.clone() } else { format!("{}.{}", prefix, k) };
+                flatten_json(v, &new_prefix, out);
+            }
+        }
+        _ => {
+            out.insert(prefix.to_string(), value.clone());
+        }
+    }
+}
+
 #[async_trait]
 impl ConfigSource for FileSource {
     async fn load(&self) -> Result<HashMap<String, serde_json::Value>> {
@@ -100,23 +114,20 @@ impl ConfigSource for FileSource {
             .map_err(|e| XiaoyiError::new(ErrorKind::Config, "failed to read config file")
                 .with_meta("path", &self.path)
                 .with_meta("error", &e.to_string()))?;
-        let ext = path.extension()
-            .and_then(|s| s.to_str())
-            .unwrap_or("")
-            .to_lowercase();
-        let value = match ext.as_str() {
-            "toml" => toml::from_str(&content).map_err(|e| XiaoyiError::new(ErrorKind::Config, "failed to parse TOML").with_meta("error", &e.to_string())),
-            "json" => serde_json::from_str(&content).map_err(|e| XiaoyiError::new(ErrorKind::Config, "failed to parse JSON").with_meta("error", &e.to_string())),
-            "yaml" | "yml" => serde_yaml::from_str(&content).map_err(|e| XiaoyiError::new(ErrorKind::Config, "failed to parse YAML").with_meta("error", &e.to_string())),
+        let ext = path.extension().and_then(|s| s.to_str()).unwrap_or("");
+        let value: serde_json::Value = match ext {
+            "toml" => toml::from_str(&content).map_err(|e| XiaoyiError::new(ErrorKind::Config, "failed to parse TOML").with_meta("error", &e.to_string()))?,
+            "json" => serde_json::from_str(&content).map_err(|e| XiaoyiError::new(ErrorKind::Config, "failed to parse JSON").with_meta("error", &e.to_string()))?,
+            "yaml" | "yml" => serde_yaml::from_str(&content).map_err(|e| XiaoyiError::new(ErrorKind::Config, "failed to parse YAML").with_meta("error", &e.to_string()))?,
             _ => return Err(XiaoyiError::new(
                 ErrorKind::Config,
                 "unsupported config file format",
-            ).with_meta("path", &self.path).with_meta("extension", &ext)),
+            ).with_meta("path", &self.path).with_meta("extension", ext)),
         };
 
-        value.map_err(|e| XiaoyiError::new(ErrorKind::Config, "failed to parse config")
-            .with_meta("path", &self.path)
-            .with_meta("error", &e.to_string()))
+        let mut flat = HashMap::new();
+        flatten_json(&value, "", &mut flat);
+        Ok(flat)
     }
 }
 
