@@ -48,15 +48,24 @@ pub mod source;
 use crate::xiaoyi::core::error::{ErrorKind, Result, XiaoyiError};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::fmt::Debug;
 
 /// Configuration builder for composing multiple sources.
 ///
 /// @brief Fluent builder for multi-source configuration
 /// @group Core Runtime
 /// @since 0.1.0
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct ConfigBuilder {
     sources: Vec<Box<dyn ConfigSource>>,
+}
+
+impl Clone for ConfigBuilder {
+    fn clone(&self) -> Self {
+        Self {
+            sources: self.sources.iter().map(|s| s.clone_box()).collect(),
+        }
+    }
 }
 
 impl ConfigBuilder {
@@ -101,13 +110,14 @@ impl ConfigBuilder {
 /// @see FileSource
 /// @see EnvSource
 /// @see VaultSource
-pub trait ConfigSource: Send + Sync {
+pub trait ConfigSource: Send + Sync + Debug {
     /// Load configuration from this source.
     ///
     /// @return Key-value map or error
     /// @throw Config error on load failure
     /// @since 0.1.0
     fn load(&self) -> Result<HashMap<String, serde_json::Value>>;
+    fn clone_box(&self) -> Box<dyn ConfigSource>;
 }
 
 /// Merged configuration from all sources.
@@ -170,5 +180,44 @@ impl Config {
             }
         }
         !current.is_null()
+    }
+    /// Get all keys at the top level.
+    ///
+    /// @return Vector of key strings
+    /// @since 0.1.0
+    pub fn keys(&self) -> Vec<String> {
+        self.data.keys().cloned().collect()
+    }
+
+    /// Get the number of top-level entries.
+    ///
+    /// @return Count of entries
+    /// @since 0.1.0
+    pub fn len(&self) -> usize {
+        self.data.len()
+    }
+
+    /// Check if configuration is empty.
+    ///
+    /// @return true if no entries
+    /// @since 0.1.0
+    pub fn is_empty(&self) -> bool {
+        self.data.is_empty()
+    }
+
+    /// Iterate over all key-value pairs.
+    ///
+    /// @return Iterator over (key, value) pairs
+    /// @since 0.1.0
+    pub fn iter(&self) -> impl Iterator<Item = (&String, &serde_json::Value)> {
+        self.data.iter()
+    }
+
+    /// Get a reference to the underlying data map.
+    ///
+    /// @return Reference to the data HashMap
+    /// @since 0.1.0
+    pub fn data(&self) -> &HashMap<String, serde_json::Value> {
+        &self.data
     }
 }

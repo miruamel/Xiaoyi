@@ -37,9 +37,8 @@
 //!   - Never log full environment.
 use crate::xiaoyi::core::config::source::ConfigSource;
 use crate::xiaoyi::core::error::Result;
-use async_trait::async_trait;
 use std::collections::HashMap;
-
+use std::fmt::Debug;
 /// Environment variable configuration source.
 ///
 /// @brief Loads config from XIAOYI_* environment variables
@@ -73,9 +72,8 @@ impl EnvSource {
     }
 }
 
-#[async_trait]
 impl ConfigSource for EnvSource {
-    async fn load(&self) -> Result<HashMap<String, serde_json::Value>> {
+    fn load(&self) -> Result<HashMap<String, serde_json::Value>> {
         let mut result = HashMap::new();
 
         for (key, value) in std::env::vars() {
@@ -86,5 +84,9 @@ impl ConfigSource for EnvSource {
         }
 
         Ok(result)
+    }
+
+    fn clone_box(&self) -> Box<dyn ConfigSource> {
+        Box::new(self.clone())
     }
 }

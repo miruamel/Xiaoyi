@@ -23,21 +23,7 @@ pub mod env;
 pub mod file;
 pub mod vault;
 
-use crate::xiaoyi::core::error::Result;
-use async_trait::async_trait;
-use std::collections::HashMap;
+pub use crate::xiaoyi::core::config::ConfigSource;
 
-/// Async trait for configuration sources.
-///
-/// @brief Async configuration source contract
-/// @group Core Runtime
-/// @since 0.1.0
-#[async_trait]
-pub trait ConfigSource: Send + Sync {
-    /// Load configuration asynchronously.
-    ///
-    /// @return Key-value map or error
-    /// @throw Config error on load failure
-    /// @since 0.1.0
-    async fn load(&self) -> Result<HashMap<String, serde_json::Value>>;
-}
+use crate::xiaoyi::core::error::Result;
+use std::collections::HashMap;

@@ -35,6 +35,7 @@
 //! - All error kinds are non-exhaustive; new variants may be added in minor versions.
 //! - Use `ErrorKind::*` to match on categories.
 //! - Metadata is opaque key-value pairs for structured logging and recovery.
+use serde::{Deserialize, Serialize};
 use std::fmt;
 
 /// Unified error kind for Xiaoyi runtime.
@@ -42,7 +43,7 @@ use std::fmt;
 /// @brief Categorical failure model for runtime errors
 /// @group Core Runtime
 /// @since 0.1.0
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[non_exhaustive]
 pub enum ErrorKind {
     /// Syntax error during parsing or compilation.
@@ -77,7 +78,7 @@ pub enum ErrorKind {
 /// @group Core Runtime
 /// @since 0.1.0
 /// @see ErrorKind
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct XiaoyiError {
     /// Error category.
     pub kind: ErrorKind,
