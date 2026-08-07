@@ -111,8 +111,12 @@ pub enum NodeKind {
     Chain,
     /// Conditional branch.
     Conditional,
+    /// Conditional branch (Python binding compatibility).
+    Condition,
     /// Parallel fan-out.
     Parallel,
+    /// Merge node (Python binding compatibility).
+    Merge,
 }
 
 /// DAG edge connecting nodes.
@@ -188,8 +192,20 @@ impl DagGraph {
     /// @since 0.1.0
     pub fn add_node(&mut self, node: DagNode) -> NodeIndex {
         let idx = self.graph.add_node(node.clone());
-        self.node_indices.insert(node.id, idx);
+        self.node_indices.insert(node.id.clone(), idx);
         idx
+    }
+
+    /// Get NodeId from NodeIndex.
+    ///
+    /// @param idx Internal node index
+    /// @return NodeId if found
+    /// @since 0.1.0
+    pub fn node_id(&self, idx: NodeIndex) -> Option<NodeId> {
+        self.node_indices
+            .iter()
+            .find(|(_, &v)| v == idx)
+            .map(|(k, _)| k.clone())
     }
 
     /// Add an edge between nodes.

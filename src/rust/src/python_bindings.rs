@@ -15,11 +15,13 @@
 //! @see crate::xiaoyi::workflow::dag::graph
 
 use pyo3::exceptions::{PyRuntimeError, PyValueError};
-use pyo3::ffi::PyObject;
 use pyo3::prelude::*;
 use pyo3::types::{PyAny, PyDict};
 use pyo3::Bound;
+use std::fmt;
+use crate::xiaoyi::core::config::source::ConfigSource;
 use crate::xiaoyi::core::config::source::vault::VaultSource;
+use crate::xiaoyi::workflow::dag::graph::NodeId;
 
 /// Convert serde_json::Value to Python object.
 fn json_value_to_pyobject<'py>(
@@ -27,8 +29,8 @@ fn json_value_to_pyobject<'py>(
     val: &serde_json::Value,
 ) -> PyResult<Bound<'py, PyAny>> {
     match val {
-        serde_json::Value::Null => Ok(py.None().into()),
-        serde_json::Value::Bool(b) => Ok(b.into_pyobject(py)?.into_any()),
+        serde_json::Value::Null => Ok(py.None().into_bound(py).into_any()),
+        serde_json::Value::Bool(b) => Ok(pyo3::types::PyBool::new(py, *b).into_any()),
         serde_json::Value::Number(n) => {
             if let Some(i) = n.as_i64() {
                 Ok(i.into_pyobject(py)?.into_any())
@@ -37,7 +39,7 @@ fn json_value_to_pyobject<'py>(
             } else if let Some(f) = n.as_f64() {
                 Ok(f.into_pyobject(py)?.into_any())
             } else {
-                Ok(py.None().into())
+                Ok(py.None().into_bound(py).into_any())
             }
         }
         serde_json::Value::String(s) => Ok(s.into_pyobject(py)?.into_any()),
@@ -216,8 +218,8 @@ impl PyXiaoyiError {
         let dict = PyDict::new(py);
         for (k, v) in &self.inner.meta {
             dict.set_item(k.as_str(), v.as_str())?;
-        }
-        Ok(dict.into())
+            }
+        Ok(dict.into_any())
     }
 
     /// @brief Add a metadata key-value pair.
@@ -419,7 +421,7 @@ impl PyConfig {
     pub fn get<'py>(&self, key: &str, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         match self.inner.get::<serde_json::Value>(key) {
             Ok(val) => json_value_to_pyobject(py, &val),
-            Err(_) => Ok(py.None().into()),
+            Err(_) => Ok(py.None().into_bound(py).into_any()),
         }
     }
 
@@ -470,8 +472,8 @@ impl PyConfig {
         let dict = PyDict::new(py);
         for (k, v) in self.inner.iter() {
             dict.set_item(k.as_str(), json_value_to_pyobject(py, v)?)?;
-        }
-        Ok(dict.into())
+            }
+        Ok(dict.into_any())
     }
 }
 
@@ -512,7 +514,7 @@ impl PyConfigBuilder {
     /// @param source PyConfigSource to add.
     /// @return Self for chaining.
     /// @since 0.1.0
-    pub fn add_source(&mut self, source: PyConfigSource) -> Self {
+    pub fn add_source(&mut self, _source: &PyConfigSource) -> Self {
         // Note: In a full implementation, we'd store the source's inner
         // This is a simplified version for compatibility
         Self {
@@ -548,6 +550,16 @@ pub enum PySourceCapability {
     Watch = 1,
     /// @brief Write capability.
     Write = 2,
+}
+
+impl fmt::Display for PySourceCapability {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            PySourceCapability::Read => write!(f, "Read"),
+            PySourceCapability::Watch => write!(f, "Watch"),
+            PySourceCapability::Write => write!(f, "Write"),
+        }
+    }
 }
 
 #[pymethods]
@@ -645,15 +657,15 @@ impl PyFileSource {
             } else {
                 source.optional()
             };
-            source.load().await
+            source.load()
         });
         match result {
             Ok(data) => {
                 let dict = PyDict::new(py);
                 for (k, v) in data {
-                    dict.set_item(k.as_str(), v.into_pyobject(py)?)?;
-                }
-                Ok(dict.into())
+                    dict.set_item(k.as_str(), json_value_to_pyobject(py, &v)?)?;
+                    }
+                Ok(dict.into_any())
             }
             Err(e) => Err(PyValueError::new_err(e.to_string())),
         }
@@ -710,15 +722,15 @@ impl PyEnvSource {
             .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
         let result = rt.block_on(async {
             let source = crate::xiaoyi::core::config::source::env::EnvSource::new();
-            source.load().await
+            source.load()
         });
         match result {
             Ok(data) => {
                 let dict = PyDict::new(py);
                 for (k, v) in data {
-                    dict.set_item(k.as_str(), v.into_pyobject(py)?)?;
-                }
-                Ok(dict.into())
+                    dict.set_item(k.as_str(), json_value_to_pyobject(py, &v)?)?;
+                    }
+                Ok(dict.into_any())
             }
             Err(e) => Err(PyValueError::new_err(e.to_string())),
         }
@@ -788,15 +800,15 @@ impl PyVaultSource {
             } else {
                 source.optional()
             };
-            source.load().await
+            source.load()
         });
         match result {
             Ok(data) => {
                 let dict = PyDict::new(py);
                 for (k, v) in data {
-                    dict.set_item(k.as_str(), v.into_pyobject(py)?)?;
-                }
-                Ok(dict.into())
+                    dict.set_item(k.as_str(), json_value_to_pyobject(py, &v)?)?;
+                    }
+                Ok(dict.into_any())
             }
             Err(e) => Err(PyValueError::new_err(e.to_string())),
         }
@@ -883,6 +895,15 @@ pub enum PyIntKind {
     Unsigned = 1,
 }
 
+impl fmt::Display for PyIntKind {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            PyIntKind::Signed => write!(f, "Signed"),
+            PyIntKind::Unsigned => write!(f, "Unsigned"),
+        }
+    }
+}
+
 #[pymethods]
 impl PyIntKind {
     fn __repr__(&self) -> String {
@@ -905,6 +926,17 @@ pub enum PyIntWidth {
     W32 = 32,
     /// @brief 64-bit width.
     W64 = 64,
+}
+
+impl fmt::Display for PyIntWidth {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            PyIntWidth::W8 => write!(f, "W8"),
+            PyIntWidth::W16 => write!(f, "W16"),
+            PyIntWidth::W32 => write!(f, "W32"),
+            PyIntWidth::W64 => write!(f, "W64"),
+        }
+    }
 }
 
 #[pymethods]
@@ -937,6 +969,15 @@ pub enum PyFloatKind {
     F64 = 1,
 }
 
+impl fmt::Display for PyFloatKind {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            PyFloatKind::F32 => write!(f, "F32"),
+            PyFloatKind::F64 => write!(f, "F64"),
+        }
+    }
+}
+
 #[pymethods]
 impl PyFloatKind {
     fn __repr__(&self) -> String {
@@ -945,6 +986,7 @@ impl PyFloatKind {
 
     #[getter]
     pub fn bits(&self) -> u8 {
+
         match self {
             PyFloatKind::F32 => 32,
             PyFloatKind::F64 => 64,
@@ -977,6 +1019,19 @@ pub enum PySyntaxKind {
     Identifier = 4,
     /// @brief End of input marker.
     Eof = 5,
+}
+
+impl fmt::Display for PySyntaxKind {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            PySyntaxKind::Keyword => write!(f, "Keyword"),
+            PySyntaxKind::Operator => write!(f, "Operator"),
+            PySyntaxKind::Delimiter => write!(f, "Delimiter"),
+            PySyntaxKind::Literal => write!(f, "Literal"),
+            PySyntaxKind::Identifier => write!(f, "Identifier"),
+            PySyntaxKind::Eof => write!(f, "Eof"),
+        }
+    }
 }
 
 #[pymethods]
@@ -1012,18 +1067,24 @@ pub enum PyOperatorKind {
     CallIndex = 6,
 }
 
+impl fmt::Display for PyOperatorKind {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            PyOperatorKind::Arithmetic => write!(f, "Arithmetic"),
+            PyOperatorKind::Comparison => write!(f, "Comparison"),
+            PyOperatorKind::Logical => write!(f, "Logical"),
+            PyOperatorKind::Bitwise => write!(f, "Bitwise"),
+            PyOperatorKind::Assignment => write!(f, "Assignment"),
+            PyOperatorKind::MemberAccess => write!(f, "MemberAccess"),
+            PyOperatorKind::CallIndex => write!(f, "CallIndex"),
+        }
+    }
+}
+
 #[pymethods]
 impl PyOperatorKind {
     fn __repr__(&self) -> String {
-        match self {
-            PyOperatorKind::Arithmetic => "OperatorKind.Arithmetic".to_string(),
-            PyOperatorKind::Comparison => "OperatorKind.Comparison".to_string(),
-            PyOperatorKind::Logical => "OperatorKind.Logical".to_string(),
-            PyOperatorKind::Bitwise => "OperatorKind.Bitwise".to_string(),
-            PyOperatorKind::Assignment => "OperatorKind.Assignment".to_string(),
-            PyOperatorKind::MemberAccess => "OperatorKind.MemberAccess".to_string(),
-            PyOperatorKind::CallIndex => "OperatorKind.CallIndex".to_string(),
-        }
+        format!("OperatorKind.{}", self)
     }
 }
 
@@ -1162,9 +1223,9 @@ pub fn all_operators() -> Vec<PyOperator> {
 /// @return Parsed value or None for empty string.
 /// @since 0.1.0
 #[pyfunction]
-pub fn parse_literal(raw: &str, _kind: PySyntaxKind, py: Python<'_>) -> PyResult<PyObject> {
+pub fn parse_literal<'py>(raw: &str, _kind: PySyntaxKind, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
     // Use Python's own parsing for primitives - Rust core may not expose parse_literal
-    Ok(py.None().into())
+    Ok(py.None().into_bound(py).into_any())
 }
 
 // =============================================================================
@@ -1393,9 +1454,9 @@ impl PyDagGraph {
     /// @return The NodeId of the added node.
     /// @since 0.1.0
     pub fn add_node(&mut self, node: PyDagNode) -> PyNodeId {
-        PyNodeId {
-            inner: self.inner.add_node(node.inner),
-        }
+        let idx = self.inner.add_node(node.inner);
+        let node_id = self.inner.node_id(idx).unwrap_or_else(|| NodeId::new("unknown"));
+        PyNodeId { inner: node_id }
     }
 
     /// @brief Add an edge between nodes.
@@ -1445,7 +1506,7 @@ impl PyCacheEntry {
         if self.inner.is_expired() {
             None
         } else {
-            self.inner.value.clone()
+            Some(self.inner.value.clone())
         }
     }
 
@@ -1477,7 +1538,7 @@ impl PyCacheStats {
     /// @since 0.1.0
     #[getter]
     pub fn hits(&self) -> u64 {
-        self.inner.hits
+        self.inner.hits as u64
     }
 
     /// @brief Number of cache misses.
@@ -1485,7 +1546,7 @@ impl PyCacheStats {
     /// @since 0.1.0
     #[getter]
     pub fn misses(&self) -> u64 {
-        self.inner.misses
+        self.inner.misses as u64
     }
 
     /// @brief Cache hit rate.
@@ -1501,7 +1562,7 @@ impl PyCacheStats {
     /// @since 0.1.0
     #[getter]
     pub fn evictions(&self) -> u64 {
-        self.inner.evictions
+        self.inner.evictions as u64
     }
 
     /// @brief Current number of entries.
@@ -1569,8 +1630,7 @@ impl PyLruCache {
         rt.block_on(async {
             let duration = ttl.map(std::time::Duration::from_secs);
             self.inner.write().await.insert(key, value, duration);
-        })
-        .map_err(|e: tokio::task::JoinError| PyRuntimeError::new_err(e.to_string()))?;
+        });
         Ok(())
     }
 
@@ -1581,25 +1641,25 @@ impl PyLruCache {
     pub fn get(&self, key: &str) -> PyResult<Option<String>> {
         let rt = tokio::runtime::Runtime::new()
             .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        let key = key.to_string();
         rt.block_on(async {
-            Ok(self.inner.read().await.get(key).cloned())
+            Ok(self.inner.read().await.get(&key))
         })
         .map_err(|e: tokio::task::JoinError| PyRuntimeError::new_err(e.to_string()))
     }
-
     /// @brief Remove a key from the cache.
     /// @param key The cache key.
-    /// @return The removed value if present, None otherwise.
-    /// @since 0.1.0
-    pub fn remove(&self, key: &str) -> PyResult<Option<String>> {
+    /// @return true if key was present.
+    pub fn remove(&self, key: &str) -> PyResult<bool> {
         let rt = tokio::runtime::Runtime::new()
             .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        let key = key.to_string();
         rt.block_on(async {
-            Ok(self.inner.write().await.remove(key))
+            Ok(self.inner.write().await.remove(&key))
         })
         .map_err(|e: tokio::task::JoinError| PyRuntimeError::new_err(e.to_string()))
     }
-
+    /// @since 0.1.0
     /// @brief Clear all entries from the cache.
     /// @since 0.1.0
     pub fn clear(&self) -> PyResult<()> {
@@ -1607,13 +1667,9 @@ impl PyLruCache {
             .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
         rt.block_on(async {
             self.inner.write().await.clear();
-        })
-        .map_err(|e: tokio::task::JoinError| PyRuntimeError::new_err(e.to_string()))?;
+        });
         Ok(())
     }
-
-    /// @brief Get cache statistics.
-    /// @return CacheStats object.
     /// @since 0.1.0
     pub fn stats(&self) -> PyCacheStats {
         let rt = tokio::runtime::Runtime::new().expect("Failed to create tokio runtime");
