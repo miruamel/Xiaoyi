@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xiaoyi Architecture Diagram</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#1e1e2e',
+                primaryTextColor: '#cdd6f4',
+                primaryBorderColor: '#89b4fa',
+                lineColor: '#89b4fa',
+                secondaryColor: '#181825',
+                tertiaryColor: '#313244',
+                background: '#11111b',
+                mainBkg: '#1e1e2e',
+                secondBkg: '#181825',
+                tertiaryBkg: '#313244',
+                nodeBorder: '#89b4fa',
+                clusterBkg: '#1e1e2e',
+                clusterBorder: '#89b4fa',
+                defaultLinkColor: '#89b4fa',
+                titleColor: '#f38ba8',
+                edgeLabelBackground: '#181825',
+                nodeTextColor: '#cdd6f4',
+                fontFamily: 'JetBrains Mono, Fira Code, monospace',
+                fontSize: '14px'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                rankSpacing: 80,
+                nodeSpacing: 60,
+                ranker: 'network-simplex',
+                padding: 20
+            }
+        });
+    </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #11111b;
+            min-height: 100vh;
+        }
+        #diagram {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .mermaid {
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div id="diagram">
+        <div class="mermaid">
+flowchart TD
+    %% Main Title
+    START([XIAOYI AUTONOMOUS VERTICAL AGENT<br/>"Autonomous Software Engineer"])
+    
+    %% Layer 1: User Interface Gateway
+    subgraph L1["LAYER 1: USER INTERFACE GATEWAY / 用户接口网关"]
+        L1A["CLI • Web • API"]
+        L1B["HTTPS"]
+        L1C["Session & State"]
+        L1D["Rate Limit & Quota"]
+        L1E["Cost Estimator"]
+        L1F["Token Auth"]
+        L1G["RBAC"]
+        L1H["Request Validation"]
+        L1I["Input Validation"]
+        L1J["Sanitizer & PII Redactor"]
+        L1K["Intent Router"]
+    end
+    
+    %% Layer 2: Orchestrator
+    subgraph L2["LAYER 2: ORCHESTRATOR (AUTONOMOUS LOOP) / 编排调度"]
+        subgraph L2LOOP["AUTONOMOUS AGENT LOOP (Non-HITL)"]
+            L2A["Task Decomposer"]
+            L2B["Semantic Cache (Vector)"]
+            L2C["DAG Builder"]
+            L2D["Cycle & Conflict Detector"]
+            L2E["Dynamic Budget & Token Allocator"]
+            L2F["Parallel Execution Engine<br/>(Async State Store / Redis)"]
+            L2G["ERROR CONTEXT FORMULATOR"]
+            L2H["RETRY / REDESIGN (auto)"]
+        end
+        L2NOTE["NO HITL GATE • NO MANUAL APPROVAL • AUTO RECOVERY"]
+    end
+    
+    %% Layer 3: Builder Agent
+    subgraph L3["LAYER 3: BUILDER AGENT / 构建网关"]
+        L3A["Input Sanitizer (AST)"]
+        L3B["PII Redaction (Diff-aware)"]
+        L3C["AST Sifter"]
+        L3D["XSS Filter"]
+        L3E["Prompt Cache Manager (Prefix KV)"]
+        L3F["Context Window Mgr"]
+        L3G["Multi-File Spec Planner"]
+        L3H["Code Generator & AST Patcher"]
+        L3I["Tool Call Validator (Anti-Injection)"]
+        L3J["Self-Verification & Syntax Check"]
+        L3K["Code Formatter & Dependency Mapper"]
+    end
+    
+    %% Layer 4: AI Cascadic Critic Plant
+    subgraph L4["LAYER 4: AI CASCADIC CRITIC PLANT / 级联评审网关"]
+        L4A["⚡ Fast-Path Rules Engine<br/>(Linters/Regex)"]
+        L4B["⏳ Small-LLM Critics<br/>(Style, Doc, Accessibility)"]
+        L4C["⚙️ Stage 2 Large-LLM Critics<br/>(Security, Architecture, Complex Logic)"]
+        L4D["Model Router:<br/>Heavy (GPT-4/Claude) │ Light (Llama) │ Micro (Phi-3)"]
+        L4E["Meta-Critic Aggregator<br/>(Weighted Pareto Frontier) → JSON Extractor"]
+        L4F["Semantic Cache with<br/>Vector DB + Embedding Similarity"]
+    end
+    
+    %% Layer 5: Evaluator & Feedback Toolchain
+    subgraph L5["LAYER 5: EVALUATOR & FEEDBACK TOOLCHAIN / 评估工具链"]
+        L5A["Container Sandbox"]
+        L5B["Compilation/Build"]
+        L5C["Unit & Property Testing"]
+        L5D["Integration Testing<br/>(SAST + AST + Rule Engine)"]
+        L5E["DAST & Secret Scanning"]
+        L5F["Perf & Cost Benchmarking"]
+        L5G["Quality Gates & Compliance"]
+        L5H["Feedback Formulator<br/>(Creates Precise Error Prompts for Retry Loop)"]
+    end
+    
+    %% Layer 6A: Deployment
+    subgraph L6A["LAYER 6A: DEPLOYMENT / 部署集成"]
+        L6A1["Git PR/MR Generator"]
+        L6A2["CI/CD Pipeline Trigger"]
+        L6A3["Webhook & Slack Notifier"]
+        L6A4["Alert System"]
+    end
+    
+    %% Layer 6B: Git Checkpoint
+    subgraph L6B["LAYER 6B: GIT CHECKPOINT / Git 检查点"]
+        L6B1["Auto-commit on Stable"]
+        L6B2["Tag: xiaoyi/stable/<timestamp>"]
+        L6B3["Rollback: Auto-revert on Fail"]
+        L6B4["Feature Branch Expansion"]
+    end
+    
+    %% Layer 7: Resilience & Fallback
+    subgraph L7["LAYER 7: RESILIENCE & FALLBACK / 容错模式 (Cross-Cutting)"]
+        L7A["Circuit Breaker"]
+        L7B["Fallback Model Routing<br/>(Heavy→Light)"]
+        L7C["Exponential Backoff Retry"]
+        L7D["Dead Letter Queue"]
+        L7E["Error Classification"]
+        L7F["Recovery Strategies"]
+        L7G["Graceful Degradation Engine"]
+    end
+    
+    %% Layer 8: Knowledge & Tools
+    subgraph L8["LAYER 8: KNOWLEDGE & TOOLS MODULE / 知识库"]
+        L8A["🗃️ Vector DB (RAG Codebase)"]
+        L8B["🐙 Git-Native Repo & AST Graph"]
+        L8C["🔌 API & Tool Plugin Registry"]
+        L8D["📜 OpenAPI & Schema Store"]
+    end
+    
+    %% Layer 9: Monitoring & FinOps
+    subgraph L9["LAYER 9: MONITORING & FINOPS LAYER / 监控层 (Cross-Cutting)"]
+        L9A["Distributed Tracing (OpenTelemetry)"]
+        L9B["Token & Cost FinOps Tracker"]
+        L9C["LLM Quality Metrics<br/>(Pass@k, Hallucination Rate)"]
+        L9D["Real-time Alerting"]
+        L9E["Optimization Suggestions"]
+    end
+    
+    %% Tools Runtime
+    subgraph TOOLS["TOOLS RUNTIME (Available to All Layers)"]
+        T1["Bash • Edit • Read • Write • Glob • Grep • WebFetch"]
+        T2["WebSearch • Summarize • Skill • Task • Agent"]
+        T3["AskUserQuestion: DISABLED (Non-HITL)"]
+    end
+    
+    %% Stability Criteria
+    subgraph STABLE["STABILITY CRITERIA (Definition of Stable)"]
+        S1["✓ Build passes"]
+        S2["✓ Tests pass"]
+        S3["✓ App starts"]
+        S4["✓ No critical errors"]
+        S5["✓ Git checkpoint saved"]
+        S6["✓ Task marked stable"]
+    end
+    
+    %% Network
+    NET["Network: Unrestricted but observable"]
+    
+    %% Connections - Main flow
+    START --> L1
+    L1 --> L2
+    L2 --> L3
+    L3 --> L4
+    L4 --> L5
+    L5 --> L6A
+    L5 --> L6B
+    L6A --> L7
+    L6B --> L7
+    L7 --> L8
+    L8 --> L9
+    
+    %% Cross-cutting connections (dotted)
+    L7 -.-> L2
+    L7 -.-> L3
+    L7 -.-> L4
+    L7 -.-> L5
+    L9 -.-> L1
+    L9 -.-> L2
+    L9 -.-> L3
+    L9 -.-> L4
+    L9 -.-> L5
+    L8 -.-> L2
+    L8 -.-> L3
+    L8 -.-> L4
+    L8 -.-> L5
+    TOOLS -.-> L1
+    TOOLS -.-> L2
+    TOOLS -.-> L3
+    TOOLS -.-> L4
+    TOOLS -.-> L5
+    TOOLS -.-> L6A
+    TOOLS -.-> L6B
+    TOOLS -.-> L7
+    TOOLS -.-> L8
+    TOOLS -.-> L9
+    STABLE -.-> L6A
+    STABLE -.-> L6B
+    NET -.-> L1
+    
+    %% Internal Layer 2 flow
+    L2A --> L2B
+    L2B --> L2C
+    L2C --> L2D
+    L2D -->|cycle?| L2C
+    L2D --> L2E
+    L2E --> L2F
+    L2F --> L2G
+    L2G --> L2H
+    L2H -->|auto| L2A
+    
+    %% Internal Layer 4 flow
+    L4A --> L4B
+    L4B --> L4C
+    L4C --> L4D
+    L4D --> L4E
+    L4E --> L4F
+    L4F --> L4A
+    
+    %% Internal Layer 5 flow
+    L5A --> L5B
+    L5B --> L5C
+    L5C --> L5D
+    L5D --> L5E
+    L5E --> L5F
+    L5F --> L5G
+    L5G --> L5H
+    L5H -->|retry| L2
+    
+    %% Styling
+    classDef layer fill:#1e1e2e,stroke:#89b4fa,stroke-width:2px,color:#cdd6f4;
+    classDef sublayer fill:#181825,stroke:#74c7ec,stroke-width:1px,color:#cdd6f4;
+    classDef crosscut fill:#1e1e2e,stroke:#f9e2af,stroke-width:2px,stroke-dasharray: 5 5,color:#cdd6f4;
+    classDef tools fill:#1e1e2e,stroke:#a6e3a1,stroke-width:2px,color:#cdd6f4;
+    classDef stable fill:#1e1e2e,stroke:#fab387,stroke-width:2px,color:#cdd6f4;
+    classDef start fill:#1e1e2e,stroke:#f38ba8,stroke-width:3px,color:#cdd6f4;
+    
+    class START start;
+    class L1,L2,L3,L4,L5,L6A,L6B,L8 layer;
+    class L2LOOP sublayer;
+    class L7,L9 crosscut;
+    class TOOLS tools;
+    class STABLE stable;
+        </div>
+    </div>
+    <script>
+        // Wait for mermaid to render, then screenshot
+        setTimeout(async () => {
+            const svg = document.querySelector('.mermaid svg');
+            if (svg) {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const scale = 2; // 2x for high quality
+                
+                const xml = new XMLSerializer().serializeToString(svg);
+                const img = new Image();
+                const blob = new Blob([xml], {type: 'image/svg+xml'});
+                const url = URL.createObjectURL(blob);
+                
+                img.onload = () => {
+                    canvas.width = img.width * scale;
+                    canvas.height = img.height * scale;
+                    ctx.scale(scale, scale);
+                    ctx.drawImage(img, 0, 0);
+                    URL.revokeObjectURL(url);
+                    
+                    canvas.toBlob((blob) => {
+                        const a = document.createElement('a');
+                        a.href = URL.createObjectURL(blob);
+                        a.download = 'architecture.png';
+                        a.click();
+                    }, 'image/png', 1.0);
+                };
+                img.src = url;
+            }
+        }, 3000);
+    </script>
+</body>
+</html>
