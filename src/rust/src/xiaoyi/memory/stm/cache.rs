@@ -35,12 +35,6 @@
 //! - Thread-safe with RwLock.
 //! - Configurable capacity.
 //!
-//! @performance
-use crate::xiaoyi::core::config::source::ConfigSource;
-use crate::xiaoyi::core::error::Result;
-use async_trait::async_trait;
-//!   - Space: O(capacity)
-//!   - Lock contention: minimal (sharded in future)
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use std::time::{Duration, Instant};
