@@ -1,52 +1,115 @@
 version: 2
 updates:
+  # Rust dependencies
   - package-ecosystem: "cargo"
     directory: "/src/rust"
     schedule:
       interval: "weekly"
       day: "monday"
+      time: "06:00"
+      timezone: "UTC"
     groups:
       rust-dependencies:
         patterns: ["*"]
+        update-types:
+          - "minor"
+          - "patch"
     open-pull-requests-limit: 10
     labels:
       - "dependencies"
       - "rust"
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
+  # TypeScript/Node.js dependencies
   - package-ecosystem: "npm"
     directory: "/src/typescript"
     schedule:
       interval: "weekly"
       day: "tuesday"
+      time: "06:00"
+      timezone: "UTC"
     groups:
       npm-dependencies:
         patterns: ["*"]
+        update-types:
+          - "minor"
+          - "patch"
     open-pull-requests-limit: 10
     labels:
       - "dependencies"
       - "typescript"
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
+  # Python dependencies
   - package-ecosystem: "pip"
     directory: "/src/python"
     schedule:
       interval: "weekly"
       day: "wednesday"
+      time: "06:00"
+      timezone: "UTC"
     groups:
       pip-dependencies:
         patterns: ["*"]
+        update-types:
+          - "minor"
+          - "patch"
     open-pull-requests-limit: 10
     labels:
       - "dependencies"
       - "python"
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
+  # GitHub Actions dependencies
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "thursday"
+      time: "06:00"
+      timezone: "UTC"
     groups:
       github-actions:
         patterns: ["*"]
+        update-types:
+          - "minor"
+          - "patch"
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
       - "ci"
+    allow:
+      - dependency-type: "direct"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # Docker dependencies (if any)
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "friday"
+      time: "06:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "docker"
+    allow:
+      - dependency-type: "direct"

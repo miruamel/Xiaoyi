@@ -1,0 +1,93 @@
+name: Dependabot Auto-Merge
+
+on:
+  pull_request:
+    types: [labeled, unlabeled, synchronize, opened, edited, ready_for_review, reopened, unlocked]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  statuses: read
+
+jobs:
+  dependabot-auto-merge:
+    name: Auto-merge Dependabot PRs
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]' && github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable auto-merge for minor/patch updates
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const prNumber = context.payload.pull_request.number;
+            const labels = context.payload.pull_request.labels.map(l => l.name);
+
+            // Check if PR has the right labels (minor/patch)
+            const isMinorOrPatch = labels.some(l =>
+              l.includes('minor') || l.includes('patch') || l.includes('dependencies')
+            );
+
+            // Skip major version updates
+            const isMajor = labels.some(l => l.includes('major'));
+
+            if (isMajor) {
+              console.log('Skipping major version update');
+              return;
+            }
+
+            // Check if all status checks have passed
+            const { data: checks } = await github.rest.checks.listForRef({
+              owner,
+              repo,
+              ref: context.payload.pull_request.head.sha,
+              per_page: 100
+            });
+
+            const allPassed = checks.check_runs.every(check =>
+              check.conclusion === 'success' || check.conclusion === 'skipped' || check.conclusion === 'neutral'
+            );
+
+            if (!allPassed) {
+              console.log('Not all checks passed, waiting...');
+              return;
+            }
+
+            // Enable auto-merge
+            try {
+              await github.rest.pulls.update({
+                owner,
+                repo,
+                pull_number: prNumber,
+                merge_method: 'squash'
+              });
+              await github.graphql(`
+                mutation($prId: ID!) {
+                  enablePullRequestAutoMerge(input: {pullRequestId: $prId, mergeMethod: SQUASH}) {
+                    pullRequest { autoMergeRequest { enabledAt } }
+                  }
+                }
+              `, { prId: context.payload.pull_request.node_id });
+              console.log('Auto-merge enabled for PR #' + prNumber);
+            } catch (error) {
+              console.log('Auto-merge already enabled or error:', error.message);
+            }
+
+      - name: Approve Dependabot PR
+        if: github.event_name == 'pull_request' && github.event.action == 'opened'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const prNumber = context.payload.pull_request.number;
+            await github.rest.pulls.createReview({
+              owner,
+              repo,
+              pull_number: prNumber,
+              event: 'APPROVE',
+              body: 'Auto-approved by dependabot-auto-merge workflow'
+            });
