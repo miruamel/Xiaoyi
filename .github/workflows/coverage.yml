@@ -1,0 +1,111 @@
+name: Coverage
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+jobs:
+  rust-coverage:
+    name: Rust Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            src/rust/target
+          key: ${{ runner.os }}-cargo-coverage-${{ hashFiles('src/rust/Cargo.lock') }}
+
+      - name: Generate coverage
+        uses: taiki-e/install-action@cargo-llvm-cov
+        with:
+          tool: cargo-llvm-cov
+
+      - name: Run coverage
+        run: |
+          cd src/rust
+          cargo llvm-cov --all-features --workspace --lcov --output-path lcov.info
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: src/rust/lcov.info
+          flags: rust
+          fail_ci_if_error: false
+
+  typescript-coverage:
+    name: TypeScript Coverage
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/typescript
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: src/typescript/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests with coverage
+        run: npm run coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage/lcov.info
+          flags: typescript
+          fail_ci_if_error: false
+
+  python-coverage:
+    name: Python Coverage
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/python
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -U pip
+          pip install -e ".[dev]"
+          pip install pytest-cov
+
+      - name: Run tests with coverage
+        run: pytest --cov=xiaoyi --cov-report=xml --cov-report=term-missing
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.xml
+          flags: python
+          fail_ci_if_error: false
