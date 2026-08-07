@@ -1,0 +1,72 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: detect-private-key
+
+  - repo: https://github.com/dnephin/pre-commit-golang
+    rev: v0.5.1
+    hooks: []
+
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.5
+    hooks:
+      - id: forbid-crlf
+      - id: remove-crlf
+
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.41.0
+    hooks:
+      - id: markdownlint
+        args: ["--config", ".markdownlint.json"]
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args: ["--config-file", ".yamllint.yml"]
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.8
+    hooks:
+      - id: ruff
+        args: ["--fix", "--config=src/python/pyproject.toml"]
+        files: ^src/python/
+      - id: ruff-format
+        files: ^src/python/
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.10.0
+    hooks:
+      - id: mypy
+        files: ^src/python/
+        additional_dependencies: ["types-cryptography"]
+        args: ["--config-file=src/python/pyproject.toml"]
+
+  - repo: https://github.com/doublify/pre-commit-rust
+    rev: 1.0
+    hooks:
+      - id: fmt
+        files: ^src/rust/
+        args: ["--manifest-path", "src/rust/Cargo.toml"]
+      - id: clippy
+        files: ^src/rust/
+        args: ["--manifest-path", "src/rust/Cargo.toml", "--", "-D", "warnings"]
+
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v9.9.1
+    hooks:
+      - id: eslint
+        files: ^src/typescript/.*\.(ts|tsx)$
+        additional_dependencies:
+          - eslint@^9.9.0
+          - "@typescript-eslint/parser@^7.0.0"
+          - "@typescript-eslint/eslint-plugin@^7.0.0"
+        args: ["--config", "src/typescript/.eslintrc.json"]

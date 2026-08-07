@@ -1,0 +1,21 @@
+avoid-breaking-exported-api = false
+msrv = "1.82"
+
+[lints]
+avoid-breaking-exported-api = false
+msrv = "1.82"
+
+[lints.clippy]
+# Correctness
+correctness = { level = "deny", priority = -1 }
+# Style
+pedantic = { level = "warn", priority = -1 }
+# Restriction lints — opt-in
+unwrap_used = "warn"
+expect_used = "warn"
+panic = "warn"
+# Allow these (common in async/no_std contexts)
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+module_name_repetitions = "allow"
+must_use_candidate = "allow"

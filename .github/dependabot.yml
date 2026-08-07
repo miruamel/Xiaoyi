@@ -1,0 +1,52 @@
+version: 2
+updates:
+  - package-ecosystem: "cargo"
+    directory: "/src/rust"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    groups:
+      rust-dependencies:
+        patterns: ["*"]
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "rust"
+
+  - package-ecosystem: "npm"
+    directory: "/src/typescript"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+    groups:
+      npm-dependencies:
+        patterns: ["*"]
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "typescript"
+
+  - package-ecosystem: "pip"
+    directory: "/src/python"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    groups:
+      pip-dependencies:
+        patterns: ["*"]
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "python"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns: ["*"]
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "ci"

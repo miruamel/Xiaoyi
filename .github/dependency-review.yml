@@ -1,0 +1,11 @@
+fail_on_severity: "high"
+severity: "medium"
+comment_summary_in_pr: true
+warn_on_external_imports: true
+groups:
+  - name: "Rust dependencies"
+    paths: ["src/rust/**"]
+  - name: "TypeScript dependencies"
+    paths: ["src/typescript/**"]
+  - name: "Python dependencies"
+    paths: ["src/python/**"]
