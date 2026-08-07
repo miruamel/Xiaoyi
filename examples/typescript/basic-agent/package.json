@@ -1,0 +1,19 @@
+{
+  "name": "xiaoyi-basic-agent",
+  "version": "0.1.0",
+  "description": "Basic agent example for Xiaoyi TypeScript SDK",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "dev": "ts-node main.ts"
+  },
+  "dependencies": {
+    "xiaoyi-ts": "file:../../../src/typescript"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0",
+    "@types/node": "^20.0.0"
+  }
+}
