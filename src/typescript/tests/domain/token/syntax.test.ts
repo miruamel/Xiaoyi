@@ -28,7 +28,7 @@ import {
   stringLiteral,
   boolLiteral,
   parseLiteral,
-} from "../../src/xiaoyi/domain/token/syntax";
+} from "@xiaoyi/xiaoyi/domain/token/syntax";
 
 describe("domain/token/syntax", () => {
   describe("SyntaxKind enum", () => {

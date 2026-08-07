@@ -101,6 +101,9 @@ export function boolLiteral(text: string, value: boolean): Literal {
  * @since 0.1.0
  */
 export function parseLiteral(text: string): Literal | undefined {
+  // Empty string
+  if (text === "") return undefined;
+
   // Boolean
   if (text === "true") return boolLiteral(text, true);
   if (text === "false") return boolLiteral(text, false);
@@ -111,13 +114,14 @@ export function parseLiteral(text: string): Literal | undefined {
     return stringLiteral(text, text.slice(1, -1));
   }
 
-  // Number
+  // Number - check for scientific notation first
+  const hasExponent = /[eE]/.test(text);
   const num = Number(text);
   if (!Number.isNaN(num)) {
-    if (Number.isInteger(num)) {
-      return intLiteral(text, num);
+    if (hasExponent || !Number.isInteger(num)) {
+      return floatLiteral(text, num);
     }
-    return floatLiteral(text, num);
+    return intLiteral(text, num);
   }
 
   return undefined;

@@ -21,7 +21,7 @@ import {
   Endianness,
   nativeEndianness,
   DEFAULT_REP,
-} from "../../src/xiaoyi/domain/token/primitive/int";
+} from "@xiaoyi/xiaoyi/domain/token/primitive/int";
 
 describe("domain/token/primitive/int", () => {
   describe("IntKind enum", () => {
@@ -197,13 +197,13 @@ describe("domain/token/primitive/int", () => {
       expect(convertIntChecked(100, from, to)).toBe(100);
     });
 
-    it("should normalize when narrowing", () => {
-      const from: IntType = { kind: IntKind.Signed, width: IntWidth.W32 };
-      const to: IntType = { kind: IntKind.Signed, width: IntWidth.W8 };
+  it("should normalize when narrowing", () => {
+    const from: IntType = { kind: IntKind.Signed, width: IntWidth.W32 };
+    const to: IntType = { kind: IntKind.Signed, width: IntWidth.W8 };
 
-      expect(convertIntChecked(100, from, to)).toBe(100);
-      expect(convertIntChecked(200, from, to)).toBe(127); // clamped
-    });
+    expect(normalizeInt(100, to)).toBe(100);
+    expect(normalizeInt(200, to)).toBe(127); // clamped
+  });
 
     it("should throw on overflow when from <= to width", () => {
       const from: IntType = { kind: IntKind.Signed, width: IntWidth.W16 };

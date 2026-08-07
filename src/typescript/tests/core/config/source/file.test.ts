@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { FileSource, ConfigFormat, FileSourceOptions } from "../../src/xiaoyi/core/config/source/file";
+import { FileSource, ConfigFormat, FileSourceOptions } from "@xiaoyi/xiaoyi/core/config/source/file";
 import * as fs from "fs/promises";
 import * as path from "path";
 

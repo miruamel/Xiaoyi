@@ -19,7 +19,18 @@
  * @see domain.token.primitive.int
  * @see domain.token.primitive.int.kind
  */
-import { IntWidth } from "..";
+export enum IntWidth {
+  /** 8-bit. */
+  W8 = 8,
+  /** 16-bit. */
+  W16 = 16,
+  /** 32-bit. */
+  W32 = 32,
+  /** 64-bit. */
+  W64 = 64,
+  /** 128-bit. */
+  W128 = 128,
+}
 
 /** 8-bit integer width. */
 export const W8: IntWidth = IntWidth.W8;

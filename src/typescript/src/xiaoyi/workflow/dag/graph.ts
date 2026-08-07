@@ -77,9 +77,45 @@ export class DagBuilder {
    * Build the DAG.
    *
    * @returns Executable DAG
+   * @throws Error if cycle detected or edge references missing nodes
    * @since 0.1.0
    */
   build(): Dag {
+    // Validate all edge targets exist
+    for (const [from, tos] of this.edges) {
+      for (const to of tos) {
+        if (!this.nodes.has(to)) {
+          throw new Error(`Edge target node not found: ${to}`);
+        }
+      }
+    }
+    // Validate all edge sources exist
+    for (const from of this.edges.keys()) {
+      if (!this.nodes.has(from)) {
+        throw new Error(`Edge source node not found: ${from}`);
+      }
+    }
+    // Validate no cycles using topological sort
+    const visited = new Set<string>();
+    const visiting = new Set<string>();
+
+    const visit = (nodeId: string): void => {
+      if (visiting.has(nodeId)) {
+        throw new Error(`Cycle detected in DAG involving node: ${nodeId}`);
+      }
+      if (visited.has(nodeId)) return;
+      visiting.add(nodeId);
+      for (const to of this.edges.get(nodeId) ?? []) {
+        visit(to);
+      }
+      visiting.delete(nodeId);
+      visited.add(nodeId);
+    };
+
+    for (const nodeId of this.nodes.keys()) {
+      visit(nodeId);
+    }
+
     return new Dag(this.nodes, this.edges);
   }
 }
@@ -161,6 +197,27 @@ export class Dag {
     return nodeIds.length === 1
       ? results.get(nodeIds[0])
       : Object.fromEntries(results);
+  }
+
+  /**
+   * Get all nodes in the DAG.
+   *
+   * @returns Array of all nodes
+   * @since 0.1.0
+   */
+  getNodes(): DagNode[] {
+    return Array.from(this.nodes.values());
+  }
+
+  /**
+   * Get a node by ID.
+   *
+   * @param id - Node ID
+   * @returns Node or undefined if not found
+   * @since 0.1.0
+   */
+  getNode(id: string): DagNode | undefined {
+    return this.nodes.get(id);
   }
 
   /**

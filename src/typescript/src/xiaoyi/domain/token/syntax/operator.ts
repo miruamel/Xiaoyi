@@ -48,6 +48,8 @@ export enum OperatorKind {
   MemberAccess = "member_access",
   /** Call/Index ((), []) */
   CallIndex = "call_index",
+  /** Other operators. */
+  Other = "other",
 }
 
 /** Associativity. */

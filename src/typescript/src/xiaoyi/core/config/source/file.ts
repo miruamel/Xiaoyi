@@ -110,23 +110,79 @@ export class FileSource implements ConfigSource {
     }
   }
 
-  /** Simple YAML parser (subset). */
+  /** Simple YAML parser (subset with nested support). */
   private parseYaml(content: string): Record<string, unknown> {
     const result: Record<string, unknown> = {};
-    for (const line of content.split("\n")) {
+    const lines = content.split("\n");
+    const stack: Array<{ indent: number; obj: Record<string, unknown> }> = [
+      { indent: -1, obj: result },
+    ];
+
+    for (const line of lines) {
       const trimmed = line.trim();
       if (!trimmed || trimmed.startsWith("#")) continue;
+
+      // Calculate indent
+      const indent = line.length - line.trimStart().length;
       const idx = trimmed.indexOf(":");
-      if (idx > 0) {
-        const key = trimmed.slice(0, idx).trim();
-        const value = trimmed.slice(idx + 1).trim();
-        result[key] = this.parseYamlValue(value);
+      if (idx <= 0) continue;
+
+      const key = trimmed.slice(0, idx).trim();
+      const value = trimmed.slice(idx + 1).trim();
+
+      // Find parent based on indent
+      while (stack.length > 1 && stack[stack.length - 1].indent >= indent) {
+        stack.pop();
+      }
+
+      const parent = stack[stack.length - 1].obj;
+      if (value === "" || value === "|" || value === ">") {
+        // Nested object
+        const nested: Record<string, unknown> = {};
+        parent[key] = nested;
+        stack.push({ indent, obj: nested });
+      } else {
+        parent[key] = this.parseYamlValue(value);
       }
     }
     return result;
   }
 
-  /** Parse YAML value. */
+  /** Simple TOML parser (subset with nested support). */
+  private parseToml(content: string): Record<string, unknown> {
+    const result: Record<string, unknown> = {};
+    const lines = content.split("\n");
+    let currentTable: Record<string, unknown> = result;
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) continue;
+
+      // Check for table headers [section] or [section.subsection]
+      const tableMatch = trimmed.match(/^\[(.+)\]$/);
+      if (tableMatch) {
+        const tablePath = tableMatch[1].split(".");
+        currentTable = result;
+        for (const part of tablePath) {
+          if (!(part in currentTable) || typeof currentTable[part] !== "object") {
+            currentTable[part] = {};
+          }
+          currentTable = currentTable[part] as Record<string, unknown>;
+        }
+        continue;
+      }
+
+      const idx = trimmed.indexOf("=");
+      if (idx > 0) {
+        const key = trimmed.slice(0, idx).trim();
+        const value = trimmed.slice(idx + 1).trim();
+        currentTable[key] = this.parseYamlValue(value);
+      }
+    }
+    return result;
+  }
+
+  /** Parse YAML/TOML value. */
   private parseYamlValue(value: string): unknown {
     if (value === "true") return true;
     if (value === "false") return false;
@@ -136,21 +192,7 @@ export class FileSource implements ConfigSource {
     return value.replace(/^["']|["']$/g, "");
   }
 
-  /** Simple TOML parser (subset). */
-  private parseToml(content: string): Record<string, unknown> {
-    const result: Record<string, unknown> = {};
-    for (const line of content.split("\n")) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith("#")) continue;
-      const idx = trimmed.indexOf("=");
-      if (idx > 0) {
-        const key = trimmed.slice(0, idx).trim();
-        const value = trimmed.slice(idx + 1).trim();
-        result[key] = this.parseYamlValue(value);
-      }
-    }
-    return result;
-  }
+  /**
 
   /**
    * Watch for file changes.

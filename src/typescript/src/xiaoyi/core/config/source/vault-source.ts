@@ -28,6 +28,8 @@ export interface VaultSourceOptions {
   password: string;
   /** Source priority. */
   priority?: number;
+  /** Watch interval in ms (default 5000). */
+  watchInterval?: number;
 }
 
 /** Encrypted configuration source. */
@@ -36,6 +38,7 @@ export class VaultSource implements ConfigSource {
   public readonly priority: number;
   private readonly path: string;
   private readonly password: string;
+  private readonly watchInterval: number;
 
   /**
    * Create vault source.
@@ -49,6 +52,7 @@ export class VaultSource implements ConfigSource {
     this.password = options.password;
     this.name = `vault:${options.path}`;
     this.priority = options.priority ?? 300;
+    this.watchInterval = options.watchInterval ?? 100;
   }
 
   /**
@@ -81,6 +85,7 @@ export class VaultSource implements ConfigSource {
   watch(callback: (config: Record<string, unknown>) => void): () => void {
     let stopped = false;
     let lastMtime = 0;
+    let isFirstCheck = true;
 
     const check = async () => {
       if (stopped) return;
@@ -88,14 +93,17 @@ export class VaultSource implements ConfigSource {
         const stat = await fs.stat(this.path);
         if (stat.mtimeMs > lastMtime) {
           lastMtime = stat.mtimeMs;
-          const config = await this.load();
-          callback(config);
+          if (!isFirstCheck) {
+            const config = await this.load();
+            callback(config);
+          }
+          isFirstCheck = false;
         }
       } catch {
         // Ignore errors during watch
       }
       if (!stopped) {
-        setTimeout(check, 1000);
+        setTimeout(check, this.watchInterval);
       }
     };
 

@@ -16,7 +16,7 @@
  * @see core.error
  * @see core.config
  */
-import { XiaoyiError } from "./error";
+import { ErrorKind, XiaoyiError } from "./error";
 
 /**
  * Result type for operations that can fail.
@@ -183,5 +183,6 @@ export async function toPromise<T, E>(result: Result<T, E>): Promise<Result<T, E
 }
 
 // Re-export ErrorKind and XiaoyiError from error module
-export type { ErrorKind, XiaoyiError } from "./error";
+export { ErrorKind };
+export type { XiaoyiError } from "./error";
 export { createError, isXiaoyiError } from "./error";

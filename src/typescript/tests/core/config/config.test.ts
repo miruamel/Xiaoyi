@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { ConfigBuilder, Config, ConfigSource, ConfigSourceError, ConfigMergeStrategy, ConfigValue } from "../../src/xiaoyi/core/config";
+import { ConfigBuilder, Config, ConfigSource, ConfigSourceError, ConfigMergeStrategy, ConfigValue } from "@xiaoyi/xiaoyi/core/config";
 
 describe("core/config", () => {
   describe("ConfigBuilder", () => {

@@ -34,6 +34,8 @@ export interface Delimiter {
 export enum DelimiterKind {
   /** Parentheses () */
   Paren = "paren",
+  /** Parentheses () (alias) */
+  Parenthesis = "parenthesis",
   /** Square brackets [] */
   Bracket = "bracket",
   /** Curly braces {} */

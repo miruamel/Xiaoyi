@@ -51,15 +51,30 @@ export class EnvSource implements ConfigSource {
     this.parser = options.parser ?? this.defaultParser.bind(this);
   }
 
-  /** Default value parser. */
+  /** Default value parser - parses all valid JSON. */
   private defaultParser(value: string): unknown {
-    // Try to parse as JSON
     try {
       return JSON.parse(value);
     } catch {
-      // Return as string
+      // Return as string if not valid JSON
       return value;
     }
+  }
+
+  /**
+   * Set nested value in object using dot notation.
+   */
+  private setNested(obj: Record<string, unknown>, path: string, value: unknown): void {
+    const keys = path.split(".");
+    let current = obj;
+    for (let i = 0; i < keys.length - 1; i++) {
+      const key = keys[i];
+      if (!(key in current) || typeof current[key] !== "object" || current[key] === null) {
+        current[key] = {};
+      }
+      current = current[key] as Record<string, unknown>;
+    }
+    current[keys[keys.length - 1]] = value;
   }
 
   /**
@@ -74,7 +89,8 @@ export class EnvSource implements ConfigSource {
     for (const [key, value] of Object.entries(process.env)) {
       if (key.startsWith(this.prefix) && value !== undefined) {
         const configKey = key.slice(this.prefix.length).toLowerCase().replace(/_/g, ".");
-        result[configKey] = this.parser(value);
+        const parsedValue = this.parser(value);
+        this.setNested(result, configKey, parsedValue);
       }
     }
 

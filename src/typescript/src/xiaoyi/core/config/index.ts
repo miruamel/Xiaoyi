@@ -19,23 +19,20 @@
  * @see core.config.source
  * @see core.config.source.file
  * @see core.config.source.env
-export * from "./source";
-export * from "./config";
-export * from "./builder";
-export { ConfigBuilder } from "./builder";
-export { Config } from "./config";
-export { ConfigSource } from "./source";
-export { ConfigSourceError } from "./config";
-
-/**
- * Configuration value type.
- *
- * @brief Supported config value types
- * @group Core
- * @since 0.1.0
  */
-export type ConfigValue = string | number | boolean | null | ConfigValue[] | { [key: string]: ConfigValue };
+import { ConfigBuilder } from "./builder";
+import { ConfigSourceError } from "./config";
+import { FileSource } from "./source/file";
+import { EnvSource } from "./source/env";
+import { VaultSource } from "./source/vault";
 
+export { ConfigBuilder };
+export { ConfigSourceError };
+export { FileSource };
+export { EnvSource };
+export { VaultSource };
+export type { Config, ConfigSource } from "./config";
+export type ConfigValue = string | number | boolean | null | ConfigValue[] | { [key: string]: ConfigValue };
 /**
  * Configuration merge strategy.
  *

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { DagBuilder, Dag, DagNode, DagNodeExecute } from "../../src/xiaoyi/workflow/dag";
+import { DagBuilder, Dag, DagNode, DagNodeExecute } from "@xiaoyi/xiaoyi/workflow/dag";
 
 describe("workflow/dag/graph", () => {
   describe("DagBuilder", () => {

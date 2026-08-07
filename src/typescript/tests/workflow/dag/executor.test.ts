@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
-import { executeDag, ExecutionMode, ExecutorOptions, NodeResult, DagExecutionResult, defaultExecutorOptions } from "../../src/xiaoyi/workflow/dag/executor";
-import { DagBuilder, Dag, DagNodeExecute } from "../../src/xiaoyi/workflow/dag";
+import { executeDag, ExecutionMode, ExecutorOptions, NodeResult, DagExecutionResult, defaultExecutorOptions } from "@xiaoyi/xiaoyi/workflow/dag/executor";
+import { DagBuilder, Dag, DagNodeExecute } from "@xiaoyi/xiaoyi/workflow/dag";
 
 describe("workflow/dag/executor", () => {
   describe("ExecutionMode enum", () => {

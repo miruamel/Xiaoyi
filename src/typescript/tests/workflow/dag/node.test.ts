@@ -7,7 +7,7 @@ import {
   DagNode,
   NodeContext,
   TypedNodeExecute,
-} from "../../src/xiaoyi/workflow/dag/node";
+} from "@xiaoyi/xiaoyi/workflow/dag/node";
 
 describe("workflow/dag/node", () => {
   describe("createNode", () => {

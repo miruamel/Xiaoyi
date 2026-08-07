@@ -41,7 +41,7 @@ export enum ExecutionMode {
 export interface ExecutorOptions {
   /** Execution mode. */
   mode?: ExecutionMode;
-  /** Max concurrent nodes (for ParallelLimited). */
+  /** Max concurrent nodes (for Parallel and ParallelLimited). */
   maxConcurrency?: number;
   /** Timeout per node in ms. */
   nodeTimeout?: number;
@@ -49,6 +49,12 @@ export interface ExecutorOptions {
   timeout?: number;
   /** Continue on node error. */
   continueOnError?: boolean;
+  /** Callback when node starts. */
+  onNodeStart?: (nodeId: string) => void;
+  /** Callback when node completes. */
+  onNodeComplete?: (nodeId: string, result: NodeResult) => void;
+  /** Callback when node errors. */
+  onNodeError?: (nodeId: string, error: Error) => void;
 }
 
 /**
@@ -83,8 +89,10 @@ export interface DagExecutionResult {
   success: boolean;
   /** Node results. */
   nodeResults: NodeResult[];
-  /** Final output. */
+  /** Final output - single value if one leaf node, object with all leaf outputs if multiple. */
   output?: unknown;
+  /** Error if execution failed. */
+  error?: Error;
   /** Total execution time in ms. */
   totalDuration: number;
 }
@@ -112,8 +120,11 @@ export async function executeDag(
     mode = ExecutionMode.Sequential,
     maxConcurrency = 4,
     nodeTimeout = 30000,
-    timeout = 300000,
+    timeout,
     continueOnError = false,
+    onNodeStart,
+    onNodeComplete,
+    onNodeError,
   } = options;
 
   const startTime = Date.now();
@@ -123,21 +134,73 @@ export async function executeDag(
 
   const order = dag.topologicalOrder();
 
+  // Build reverse edges map (nodeId -> array of upstream nodeIds)
+  const reverseEdges = new Map<string, string[]>();
+  // Build forward edges map (nodeId -> array of downstream nodeIds)
+  const forwardEdges = new Map<string, string[]>();
+  for (const [from, tos] of dag.edges) {
+    for (const to of tos) {
+      const existing = reverseEdges.get(to) ?? [];
+      existing.push(from);
+      reverseEdges.set(to, existing);
+
+      const existingForward = forwardEdges.get(from) ?? [];
+      existingForward.push(to);
+      forwardEdges.set(from, existingForward);
+    }
+  }
+
+  // Find leaf nodes (nodes with no outgoing edges)
+  const leafNodes = order.filter((nodeId) => !forwardEdges.has(nodeId) || forwardEdges.get(nodeId)!.length === 0);
+
+  // Track which nodes have completed
+  const completed = new Set<string>();
+  let hasError = false;
+  let firstError: Error | undefined;
+
+  // Create an AbortController for global timeout
+  const abortController = new AbortController();
+  const { signal } = abortController;
+
+  // Set global timeout if specified
+  let globalTimeoutHandle: NodeJS.Timeout | undefined;
+  if (timeout && timeout > 0) {
+    globalTimeoutHandle = setTimeout(() => {
+      abortController.abort(new Error("Global timeout"));
+    }, timeout);
+  }
+
   const executeNode = async (nodeId: string): Promise<unknown> => {
     const nodeStart = Date.now();
     const node = dag.nodes.get(nodeId);
     if (!node) throw new Error(`Node not found: ${nodeId}`);
 
-    // Get inputs from upstream
-    const inputs: Record<string, unknown> = {};
-    for (const [from, tos] of dag.edges) {
-      if (tos.includes(nodeId)) {
-        inputs[from] = results.get(from);
-      }
+    onNodeStart?.(nodeId);
+
+    // Check if aborted before executing
+    if (signal.aborted) {
+      throw new Error("Execution aborted");
     }
 
+    // Get inputs from upstream nodes
+    const upstreamNodes = reverseEdges.get(nodeId) ?? [];
+    let nodeInput: unknown = input;
+
+    if (upstreamNodes.length === 1) {
+      // Single upstream - pass its output directly
+      nodeInput = results.get(upstreamNodes[0]);
+    } else if (upstreamNodes.length > 1) {
+      // Multiple upstreams - pass object with all upstream outputs
+      const inputs: Record<string, unknown> = {};
+      for (const from of upstreamNodes) {
+        inputs[from] = results.get(from);
+      }
+      nodeInput = inputs;
+    }
+    // No upstreams - use initial input
+
     try {
-      const promise = node.execute(inputs);
+      const promise = node.execute(nodeInput);
       const value = nodeTimeout > 0
         ? await Promise.race([
             promise,
@@ -148,66 +211,134 @@ export async function executeDag(
         : await promise;
 
       results.set(nodeId, value);
-      nodeResults.push({
+      completed.add(nodeId);
+      const nodeResult: NodeResult = {
         nodeId,
         success: true,
         value,
         duration: Date.now() - nodeStart,
-      });
+      };
+      nodeResults.push(nodeResult);
+      onNodeComplete?.(nodeId, nodeResult);
       return value;
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
       errors.set(nodeId, err);
-      nodeResults.push({
+      completed.add(nodeId);
+      const nodeResult: NodeResult = {
         nodeId,
         success: false,
         error: err,
         duration: Date.now() - nodeStart,
-      });
+      };
+      nodeResults.push(nodeResult);
+      onNodeError?.(nodeId, err);
 
       if (!continueOnError) {
-        throw err;
+        hasError = true;
+        if (!firstError) firstError = err;
+        // Abort all remaining nodes
+        abortController.abort(err);
       }
       return undefined;
     }
   };
 
-  if (mode === ExecutionMode.Parallel) {
-    // Execute all nodes in parallel (respecting dependencies)
-    await Promise.all(order.map(executeNode));
-  } else if (mode === ExecutionMode.ParallelLimited) {
-    // Execute with concurrency limit
-    const queue = [...order];
-    const running = new Set<Promise<void>>();
-
-    while (queue.length > 0 || running.size > 0) {
-      while (queue.length > 0 && running.size < maxConcurrency) {
-        const nodeId = queue.shift()!;
-        const promise = executeNode(nodeId).then(() => {});
-        running.add(promise);
-        promise.finally(() => running.delete(promise));
+  try {
+    if (mode === ExecutionMode.Sequential) {
+      // Sequential - execute one at a time in topological order
+      for (const nodeId of order) {
+        if (signal.aborted && !continueOnError) break;
+        await executeNode(nodeId);
       }
-      if (running.size > 0) {
-        await Promise.race(running);
+    } else {
+      // Parallel modes - use a work queue with dependency tracking
+      const pending = new Set(order);
+      const running = new Set<string>();
+      let errorOccurred = false;
+
+      while (pending.size > 0 || running.size > 0) {
+        // Check for ready nodes
+        const readyNodes: string[] = [];
+        for (const nodeId of pending) {
+          const upstreamNodes = reverseEdges.get(nodeId) ?? [];
+          if (upstreamNodes.every((up) => completed.has(up))) {
+            readyNodes.push(nodeId);
+          }
+        }
+
+        // Execute ready nodes up to maxConcurrency
+        for (const nodeId of readyNodes) {
+          if (running.size >= maxConcurrency) break;
+          if (errorOccurred && !continueOnError) break;
+          if (signal.aborted && !continueOnError) break;
+          pending.delete(nodeId);
+          running.add(nodeId);
+          executeNode(nodeId)
+            .then(() => {
+              running.delete(nodeId);
+            })
+            .catch(() => {
+              running.delete(nodeId);
+              if (!continueOnError) errorOccurred = true;
+            });
+        }
+
+        if (running.size > 0) {
+          // Wait for at least one to complete
+          await new Promise<void>((resolve) => {
+            const check = () => {
+              if (running.size === 0 || signal.aborted) {
+                resolve();
+              } else {
+                setTimeout(check, 10);
+              }
+            };
+            check();
+          });
+        } else if (pending.size > 0) {
+          // No ready nodes but pending exists
+          if (signal.aborted) break;
+          // Check if we're waiting for an error to propagate
+          if (errorOccurred && !continueOnError) break;
+          // Otherwise it's a deadlock - break with warning
+          console.warn("Warning: No ready nodes but pending nodes exist");
+          break;
+        }
       }
     }
-  } else {
-    // Sequential
-    for (const nodeId of order) {
-      await executeNode(nodeId);
+
+    const totalDuration = Date.now() - startTime;
+    const success = !hasError && !signal.aborted;
+
+    // Build output: single leaf node output or object with all leaf node outputs
+    let output: unknown;
+    if (success) {
+      if (leafNodes.length === 1) {
+        output = results.get(leafNodes[0]);
+      } else if (leafNodes.length > 1) {
+        const leafOutputs: unknown[] = [];
+        for (const leaf of leafNodes) {
+          leafOutputs.push(results.get(leaf));
+        }
+        output = leafOutputs;
+      }
+    }
+
+    const error = hasError ? firstError : (signal.aborted ? (signal.reason instanceof Error ? signal.reason : new Error("Execution aborted")) : undefined);
+
+    return {
+      success,
+      nodeResults,
+      output,
+      error,
+      totalDuration,
+    };
+  } finally {
+    if (globalTimeoutHandle) {
+      clearTimeout(globalTimeoutHandle);
     }
   }
-
-  const totalDuration = Date.now() - startTime;
-  const success = errors.size === 0;
-  const output = success ? results.get(order[order.length - 1]) : undefined;
-
-  return {
-    success,
-    nodeResults,
-    output,
-    totalDuration,
-  };
 }
 
 /**
@@ -222,7 +353,6 @@ export function defaultExecutorOptions(): ExecutorOptions {
     mode: ExecutionMode.Sequential,
     maxConcurrency: 4,
     nodeTimeout: 30000,
-    timeout: 300000,
     continueOnError: false,
   };
 }

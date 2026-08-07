@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { EnvSource, EnvSourceOptions } from "../../src/xiaoyi/core/config/source/env";
+import { EnvSource, EnvSourceOptions } from "@xiaoyi/xiaoyi/core/config/source/env";
 
 describe("core/config/source/env", () => {
   const originalEnv = { ...process.env };

@@ -60,11 +60,12 @@ export function createNode<TInput, TOutput>(
   return {
     id,
     execute: async (inputs) => {
+      const controller = new AbortController();
       const context: NodeContext = {
         nodeId: id,
         inputs: inputs as Record<string, unknown>,
         executionId: crypto.randomUUID(),
-        signal: new AbortSignal(),
+        signal: controller.signal,
       };
       return execute(context);
     },

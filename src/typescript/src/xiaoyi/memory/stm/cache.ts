@@ -48,7 +48,9 @@ export interface CacheEntry<T = StmEntry> {
  */
 export class LruCache<T = StmEntry> {
   private cache = new Map<string, CacheEntry<T>>();
-  private readonly maxSize: number;
+  private readonly _maxSize: number;
+  public readonly maxSize: number;
+  private accessOrder: string[] = []; // most recent first
 
   /**
    * Create LRU cache.
@@ -56,8 +58,9 @@ export class LruCache<T = StmEntry> {
    * @param options - Cache options
    * @since 0.1.0
    */
-  constructor(options: { maxSize: number }) {
-    this.maxSize = options.maxSize;
+  constructor(options: { maxSize?: number } = {}) {
+    this._maxSize = options.maxSize ?? 1000;
+    this.maxSize = this._maxSize;
   }
 
   /**
@@ -71,6 +74,8 @@ export class LruCache<T = StmEntry> {
     const entry = this.cache.get(key);
     if (!entry) return undefined;
 
+    // Move to front (most recent)
+    this.moveToFront(key);
     entry.lastAccess = Date.now();
     entry.accessCount++;
     return entry.value;
@@ -84,15 +89,22 @@ export class LruCache<T = StmEntry> {
    * @since 0.1.0
    */
   set(key: string, value: T): void {
-    if (this.cache.size >= this.maxSize && !this.cache.has(key)) {
+    if (this._maxSize === 0) return; // No storage allowed
+
+    const exists = this.cache.has(key);
+
+    if (!exists && this.cache.size >= this._maxSize) {
       this.evict();
     }
 
     this.cache.set(key, {
       value,
       lastAccess: Date.now(),
-      accessCount: 1,
+      accessCount: exists ? this.cache.get(key)!.accessCount + 1 : 1,
     });
+
+    // Move to front (most recent)
+    this.moveToFront(key);
   }
 
   /**
@@ -114,7 +126,11 @@ export class LruCache<T = StmEntry> {
    * @since 0.1.0
    */
   delete(key: string): boolean {
-    return this.cache.delete(key);
+    const deleted = this.cache.delete(key);
+    if (deleted) {
+      this.removeFromOrder(key);
+    }
+    return deleted;
   }
 
   /**
@@ -124,6 +140,7 @@ export class LruCache<T = StmEntry> {
    */
   clear(): void {
     this.cache.clear();
+    this.accessOrder = [];
   }
 
   /**
@@ -132,18 +149,56 @@ export class LruCache<T = StmEntry> {
    * @returns Number of entries
    * @since 0.1.0
    */
-  size(): number {
+  get size(): number {
     return this.cache.size;
   }
 
   /**
-   * Get all keys.
+   * Get all keys in LRU order (most recent first).
    *
    * @returns Array of keys
    * @since 0.1.0
    */
   keys(): string[] {
-    return Array.from(this.cache.keys());
+    return [...this.accessOrder];
+  }
+
+  /**
+   * Get all entries in LRU order (most recent first).
+   *
+   * @returns Array of [key, value] pairs
+   * @since 0.1.0
+   */
+  entries(): [string, T][] {
+    return this.accessOrder.map((k) => [k, this.cache.get(k)!.value]);
+  }
+
+  /**
+   * Get all values in LRU order (most recent first).
+   *
+   * @returns Array of values
+   * @since 0.1.0
+   */
+  values(): T[] {
+    return this.accessOrder.map((k) => this.cache.get(k)!.value);
+  }
+
+  /**
+   * Move key to front (most recent).
+   */
+  private moveToFront(key: string): void {
+    this.removeFromOrder(key);
+    this.accessOrder.unshift(key);
+  }
+
+  /**
+   * Remove key from access order.
+   */
+  private removeFromOrder(key: string): void {
+    const idx = this.accessOrder.indexOf(key);
+    if (idx >= 0) {
+      this.accessOrder.splice(idx, 1);
+    }
   }
 
   /**
@@ -152,18 +207,9 @@ export class LruCache<T = StmEntry> {
    * @since 0.1.0
    */
   private evict(): void {
-    let oldestKey: string | null = null;
-    let oldestTime = Infinity;
-
-    for (const [key, entry] of this.cache) {
-      if (entry.lastAccess < oldestTime) {
-        oldestTime = entry.lastAccess;
-        oldestKey = key;
-      }
-    }
-
-    if (oldestKey) {
-      this.cache.delete(oldestKey);
+    if (this.accessOrder.length > 0) {
+      const lruKey = this.accessOrder.pop()!;
+      this.cache.delete(lruKey);
     }
   }
 
@@ -181,7 +227,7 @@ export class LruCache<T = StmEntry> {
 
     return {
       size: this.cache.size,
-      maxSize: this.maxSize,
+      maxSize: this._maxSize,
       hitRate: totalAccess > 0 ? totalAccess / this.cache.size : 0,
     };
   }

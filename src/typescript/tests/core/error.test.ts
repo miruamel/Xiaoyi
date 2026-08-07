@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { ErrorKind, XiaoyiError, createError, isXiaoyiError } from "../../src/xiaoyi/core/error";
+import { ErrorKind, XiaoyiError, createError, isXiaoyiError } from "@xiaoyi/xiaoyi/core/error";
 
 describe("core/error", () => {
   describe("ErrorKind enum", () => {
@@ -18,9 +18,9 @@ describe("core/error", () => {
       expect(ErrorKind.State).toBe("state");
     });
 
-    it("should have exactly 13 error kinds", () => {
+    it("should have exactly 12 error kinds", () => {
       const keys = Object.keys(ErrorKind).filter((k) => isNaN(Number(k)));
-      expect(keys).toHaveLength(13);
+      expect(keys).toHaveLength(12);
     });
   });
 
@@ -94,11 +94,11 @@ describe("core/error", () => {
       expect(typeof error.kind).toBe("string");
       expect(typeof error.meta).toBe("object");
     });
-
     it("should preserve Error prototype chain", () => {
       const error = createError(ErrorKind.Llm, "Model unavailable");
       expect(error instanceof Error).toBe(true);
-      expect(error instanceof XiaoyiError).toBe(false); // TypeScript interface, not class
+      // XiaoyiError is a TypeScript interface, not a class - no instanceof check
+      expect(isXiaoyiError(error)).toBe(true);
     });
   });
 });

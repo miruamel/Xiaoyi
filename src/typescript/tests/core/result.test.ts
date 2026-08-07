@@ -15,7 +15,7 @@ import {
   XiaoyiError,
   ErrorKind,
   createError,
-} from "../../src/xiaoyi/core/result";
+} from "@xiaoyi/xiaoyi/core/result";
 
 describe("core/result", () => {
   describe("ok / err constructors", () => {

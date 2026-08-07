@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { LruCache, CacheEntry, createStmCache, StmEntry } from "../../src/xiaoyi/memory/stm/cache";
+import { LruCache, CacheEntry, createStmCache, StmEntry } from "@xiaoyi/xiaoyi/memory/stm/cache";
 
 describe("memory/stm/cache", () => {
   describe("LruCache", () => {
@@ -297,12 +297,13 @@ describe("memory/stm/cache", () => {
     });
 
     it("should handle rapid set/get cycles", () => {
+      const rapidCache = new LruCache<string>({ maxSize: 3 });
       for (let i = 0; i < 100; i++) {
-        cache.set(`key${i}`, `value${i}`);
-        cache.get(`key${i}`);
+        rapidCache.set(`key${i}`, `value${i}`);
+        rapidCache.get(`key${i}`);
       }
 
-      expect(cache.size).toBeLessThanOrEqual(3);
+      expect(rapidCache.size).toBeLessThanOrEqual(3);
     });
   });
 });

@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { VaultSource, VaultSourceOptions } from "../../src/xiaoyi/core/config/source/vault-source";
+import { VaultSource, VaultSourceOptions } from "@xiaoyi/xiaoyi/core/config/source/vault-source";
 import * as fs from "fs/promises";
 import * as path from "path";
-import { encrypt as encryptConfig } from "../../src/xiaoyi/core/config/source/vault/encrypt";
-import { deriveKey } from "../../src/xiaoyi/core/config/source/vault/key";
+import { encrypt as encryptConfig } from "@xiaoyi/xiaoyi/core/config/source/vault/encrypt";
+import { deriveKey } from "@xiaoyi/xiaoyi/core/config/source/vault/key";
 
 describe("core/config/source/vault", () => {
   const testDir = "/tmp/xiaoyi-test-vault";
@@ -171,7 +171,7 @@ describe("core/config/source/vault", () => {
       const encrypted = await encryptConfig(testConfig, password);
       await fs.writeFile(vaultPath, encrypted);
 
-      const { ConfigBuilder } = await import("../../src/xiaoyi/core/config");
+      const { ConfigBuilder } = await import("@xiaoyi/xiaoyi/core/config");
       const builder = new ConfigBuilder().addSource(new VaultSource({ path: vaultPath, password }));
       const config = await builder.build();
 

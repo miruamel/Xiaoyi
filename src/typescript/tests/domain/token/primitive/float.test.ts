@@ -13,7 +13,7 @@ import {
   isF64Finite,
   isF64NaN,
   isF64Infinite,
-} from "../../src/xiaoyi/domain/token/primitive/float";
+} from "@xiaoyi/xiaoyi/domain/token/primitive/float";
 
 describe("domain/token/primitive/float", () => {
   describe("FloatKind enum", () => {

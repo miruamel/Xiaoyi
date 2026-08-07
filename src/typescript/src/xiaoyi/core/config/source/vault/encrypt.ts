@@ -34,12 +34,12 @@ import { deriveKey, generateSalt } from "./key";
 export async function encrypt(
   config: Record<string, unknown>,
   password: string
-): Promise<{ salt: Uint8Array; data: EncryptedData }> {
+): Promise<Uint8Array> {
   const salt = generateSalt();
   const key = await deriveKey({ password, salt });
   const plaintext = new TextEncoder().encode(JSON.stringify(config));
   const data = await aesEncrypt(key, plaintext);
-  return { salt, data };
+  return serialize(salt, data);
 }
 
 /**
