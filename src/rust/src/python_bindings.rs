@@ -43,14 +43,14 @@ fn json_value_to_pyobject<'py>(
         serde_json::Value::String(s) => Ok(s.into_pyobject(py)?.into_any()),
         serde_json::Value::Array(arr) => {
             let list = pyo3::types::PyList::new(py, arr.iter().map(|v| json_value_to_pyobject(py, v).unwrap()))?;
-            Ok(list.into())
+            Ok(list.into_any())
         }
         serde_json::Value::Object(obj) => {
             let dict = PyDict::new(py);
             for (k, v) in obj {
                 dict.set_item(k.as_str(), json_value_to_pyobject(py, v)?)?;
             }
-            Ok(dict.into())
+            Ok(dict.into_any())
         }
     }
 }
