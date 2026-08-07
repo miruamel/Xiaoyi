@@ -20,9 +20,9 @@
 //! @see crate::domain::token::primitive::int::kind
 //! @see crate::domain::token::primitive::int::width
 pub mod kind;
-pub mod width;
-pub mod rep;
 pub mod normalize;
+pub mod rep;
+pub mod width;
 
 /// Integer type with configurable signedness and width.
 ///

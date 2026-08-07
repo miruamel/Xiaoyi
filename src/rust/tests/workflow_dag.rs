@@ -10,8 +10,8 @@
 //! @see crate::workflow::dag::graph
 
 use pretty_assertions::assert_eq;
-use xiaoyi::{DagGraph, DagNode, DagEdge};
-use xiaoyi::workflow::dag::graph::{NodeId, NodeKind, EdgeKind};
+use xiaoyi::workflow::dag::graph::{EdgeKind, NodeId, NodeKind};
+use xiaoyi::{DagEdge, DagGraph, DagNode};
 
 #[test]
 fn test_node_id() {
@@ -50,7 +50,11 @@ fn test_dag_node_kinds() {
 
 #[test]
 fn test_dag_edge_creation() {
-    let edge = DagEdge::new(NodeId::new("task1"), NodeId::new("task2"), EdgeKind::Sequential);
+    let edge = DagEdge::new(
+        NodeId::new("task1"),
+        NodeId::new("task2"),
+        EdgeKind::Sequential,
+    );
     assert_eq!(edge.from.0, "task1");
     assert_eq!(edge.to.0, "task2");
     assert_eq!(edge.kind, EdgeKind::Sequential);
@@ -101,7 +105,11 @@ fn test_dag_graph_add_edge() {
     graph.add_node(DagNode::new(NodeId::new("task1"), "Task 1", NodeKind::Task));
     graph.add_node(DagNode::new(NodeId::new("task2"), "Task 2", NodeKind::Task));
 
-    let result = graph.add_edge(DagEdge::new(NodeId::new("task1"), NodeId::new("task2"), EdgeKind::Sequential));
+    let result = graph.add_edge(DagEdge::new(
+        NodeId::new("task1"),
+        NodeId::new("task2"),
+        EdgeKind::Sequential,
+    ));
     assert!(result.is_ok());
     assert_eq!(graph.edge_count(), 1);
 }
@@ -111,7 +119,11 @@ fn test_dag_graph_add_edge_missing_node() {
     let mut graph = DagGraph::new();
     graph.add_node(DagNode::new(NodeId::new("task1"), "Task 1", NodeKind::Task));
 
-    let result = graph.add_edge(DagEdge::new(NodeId::new("task1"), NodeId::new("nonexistent"), EdgeKind::Sequential));
+    let result = graph.add_edge(DagEdge::new(
+        NodeId::new("task1"),
+        NodeId::new("nonexistent"),
+        EdgeKind::Sequential,
+    ));
     assert!(result.is_err());
 }
 
@@ -120,7 +132,13 @@ fn test_dag_graph_topological_order_simple() {
     let mut graph = DagGraph::new();
     graph.add_node(DagNode::new(NodeId::new("task1"), "Task 1", NodeKind::Task));
     graph.add_node(DagNode::new(NodeId::new("task2"), "Task 2", NodeKind::Task));
-    graph.add_edge(DagEdge::new(NodeId::new("task1"), NodeId::new("task2"), EdgeKind::Sequential)).unwrap();
+    graph
+        .add_edge(DagEdge::new(
+            NodeId::new("task1"),
+            NodeId::new("task2"),
+            EdgeKind::Sequential,
+        ))
+        .unwrap();
 
     let order = graph.topological_order().unwrap();
     assert_eq!(order.len(), 2);
@@ -136,10 +154,34 @@ fn test_dag_graph_topological_order_branching() {
     graph.add_node(DagNode::new(NodeId::new("task2"), "Task 2", NodeKind::Task));
     graph.add_node(DagNode::new(NodeId::new("end"), "End", NodeKind::Task));
 
-    graph.add_edge(DagEdge::new(NodeId::new("start"), NodeId::new("task1"), EdgeKind::Sequential)).unwrap();
-    graph.add_edge(DagEdge::new(NodeId::new("start"), NodeId::new("task2"), EdgeKind::Sequential)).unwrap();
-    graph.add_edge(DagEdge::new(NodeId::new("task1"), NodeId::new("end"), EdgeKind::Sequential)).unwrap();
-    graph.add_edge(DagEdge::new(NodeId::new("task2"), NodeId::new("end"), EdgeKind::Sequential)).unwrap();
+    graph
+        .add_edge(DagEdge::new(
+            NodeId::new("start"),
+            NodeId::new("task1"),
+            EdgeKind::Sequential,
+        ))
+        .unwrap();
+    graph
+        .add_edge(DagEdge::new(
+            NodeId::new("start"),
+            NodeId::new("task2"),
+            EdgeKind::Sequential,
+        ))
+        .unwrap();
+    graph
+        .add_edge(DagEdge::new(
+            NodeId::new("task1"),
+            NodeId::new("end"),
+            EdgeKind::Sequential,
+        ))
+        .unwrap();
+    graph
+        .add_edge(DagEdge::new(
+            NodeId::new("task2"),
+            NodeId::new("end"),
+            EdgeKind::Sequential,
+        ))
+        .unwrap();
 
     let order = graph.topological_order().unwrap();
     assert_eq!(order.len(), 4);
@@ -152,8 +194,20 @@ fn test_dag_graph_cycle_detection() {
     let mut graph = DagGraph::new();
     graph.add_node(DagNode::new(NodeId::new("a"), "A", NodeKind::Task));
     graph.add_node(DagNode::new(NodeId::new("b"), "B", NodeKind::Task));
-    graph.add_edge(DagEdge::new(NodeId::new("a"), NodeId::new("b"), EdgeKind::Sequential)).unwrap();
-    graph.add_edge(DagEdge::new(NodeId::new("b"), NodeId::new("a"), EdgeKind::Sequential)).unwrap();
+    graph
+        .add_edge(DagEdge::new(
+            NodeId::new("a"),
+            NodeId::new("b"),
+            EdgeKind::Sequential,
+        ))
+        .unwrap();
+    graph
+        .add_edge(DagEdge::new(
+            NodeId::new("b"),
+            NodeId::new("a"),
+            EdgeKind::Sequential,
+        ))
+        .unwrap();
 
     let result = graph.topological_order();
     assert!(result.is_err());
@@ -163,10 +217,14 @@ fn test_dag_graph_cycle_detection() {
 fn test_dag_graph_self_cycle() {
     let mut graph = DagGraph::new();
     graph.add_node(DagNode::new(NodeId::new("a"), "A", NodeKind::Task));
-    let result = graph.add_edge(DagEdge::new(NodeId::new("a"), NodeId::new("a"), EdgeKind::Sequential));
+    let result = graph.add_edge(DagEdge::new(
+        NodeId::new("a"),
+        NodeId::new("a"),
+        EdgeKind::Sequential,
+    ));
     // Self-loop is added without error (current implementation doesn't check)
     assert!(result.is_ok());
-    
+
     // But topological sort should fail
     let order = graph.topological_order();
     assert!(order.is_err());
@@ -203,8 +261,18 @@ fn test_dag_graph_multiple_edges_same_nodes() {
     graph.add_node(DagNode::new(NodeId::new("task1"), "Task 1", NodeKind::Task));
     graph.add_node(DagNode::new(NodeId::new("task2"), "Task 2", NodeKind::Task));
 
-    graph.add_edge(DagEdge::new(NodeId::new("task1"), NodeId::new("task2"), EdgeKind::Sequential)).unwrap();
-    let result = graph.add_edge(DagEdge::new(NodeId::new("task1"), NodeId::new("task2"), EdgeKind::Conditional));
+    graph
+        .add_edge(DagEdge::new(
+            NodeId::new("task1"),
+            NodeId::new("task2"),
+            EdgeKind::Sequential,
+        ))
+        .unwrap();
+    let result = graph.add_edge(DagEdge::new(
+        NodeId::new("task1"),
+        NodeId::new("task2"),
+        EdgeKind::Conditional,
+    ));
     assert!(result.is_ok()); // Multiple edges between same nodes allowed
     assert_eq!(graph.edge_count(), 2);
 }
@@ -216,21 +284,67 @@ fn test_dag_graph_complex_dag() {
     // Build a complex DAG
     let nodes = ["a", "b", "c", "d", "e", "f"];
     for n in &nodes {
-        graph.add_node(DagNode::new(NodeId::new(*n), (*n).to_uppercase(), NodeKind::Task));
+        graph.add_node(DagNode::new(
+            NodeId::new(*n),
+            (*n).to_uppercase(),
+            NodeKind::Task,
+        ));
     }
 
     // a -> b, a -> c, b -> d, c -> d, d -> e, d -> f
-    graph.add_edge(DagEdge::new(NodeId::new("a"), NodeId::new("b"), EdgeKind::Sequential)).unwrap();
-    graph.add_edge(DagEdge::new(NodeId::new("a"), NodeId::new("c"), EdgeKind::Sequential)).unwrap();
-    graph.add_edge(DagEdge::new(NodeId::new("b"), NodeId::new("d"), EdgeKind::Sequential)).unwrap();
-    graph.add_edge(DagEdge::new(NodeId::new("c"), NodeId::new("d"), EdgeKind::Sequential)).unwrap();
-    graph.add_edge(DagEdge::new(NodeId::new("d"), NodeId::new("e"), EdgeKind::Sequential)).unwrap();
-    graph.add_edge(DagEdge::new(NodeId::new("d"), NodeId::new("f"), EdgeKind::Sequential)).unwrap();
+    graph
+        .add_edge(DagEdge::new(
+            NodeId::new("a"),
+            NodeId::new("b"),
+            EdgeKind::Sequential,
+        ))
+        .unwrap();
+    graph
+        .add_edge(DagEdge::new(
+            NodeId::new("a"),
+            NodeId::new("c"),
+            EdgeKind::Sequential,
+        ))
+        .unwrap();
+    graph
+        .add_edge(DagEdge::new(
+            NodeId::new("b"),
+            NodeId::new("d"),
+            EdgeKind::Sequential,
+        ))
+        .unwrap();
+    graph
+        .add_edge(DagEdge::new(
+            NodeId::new("c"),
+            NodeId::new("d"),
+            EdgeKind::Sequential,
+        ))
+        .unwrap();
+    graph
+        .add_edge(DagEdge::new(
+            NodeId::new("d"),
+            NodeId::new("e"),
+            EdgeKind::Sequential,
+        ))
+        .unwrap();
+    graph
+        .add_edge(DagEdge::new(
+            NodeId::new("d"),
+            NodeId::new("f"),
+            EdgeKind::Sequential,
+        ))
+        .unwrap();
 
     let order = graph.topological_order().unwrap();
     assert_eq!(order.len(), 6);
     assert_eq!(order[0].0, "a");
-    assert!(order.iter().position(|n| n.0 == "d").unwrap() > order.iter().position(|n| n.0 == "b").unwrap());
-    assert!(order.iter().position(|n| n.0 == "d").unwrap() > order.iter().position(|n| n.0 == "c").unwrap());
+    assert!(
+        order.iter().position(|n| n.0 == "d").unwrap()
+            > order.iter().position(|n| n.0 == "b").unwrap()
+    );
+    assert!(
+        order.iter().position(|n| n.0 == "d").unwrap()
+            > order.iter().position(|n| n.0 == "c").unwrap()
+    );
     assert!(order[5].0 == "e" || order[5].0 == "f"); // e or f last (parallel)
 }

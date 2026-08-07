@@ -93,12 +93,22 @@ impl StatusCode {
     pub fn retry_class(&self) -> RetryClass {
         use RetryClass::*;
         match self {
-            StatusCode::Ok | StatusCode::Cancelled | StatusCode::InvalidArgument
-            | StatusCode::NotFound | StatusCode::AlreadyExists | StatusCode::PermissionDenied
-            | StatusCode::FailedPrecondition | StatusCode::OutOfRange | StatusCode::Unimplemented
-            | StatusCode::DataLoss | StatusCode::Unauthenticated => Permanent,
-            StatusCode::DeadlineExceeded | StatusCode::ResourceExhausted
-            | StatusCode::Aborted | StatusCode::Internal | StatusCode::Unavailable => Transient,
+            StatusCode::Ok
+            | StatusCode::Cancelled
+            | StatusCode::InvalidArgument
+            | StatusCode::NotFound
+            | StatusCode::AlreadyExists
+            | StatusCode::PermissionDenied
+            | StatusCode::FailedPrecondition
+            | StatusCode::OutOfRange
+            | StatusCode::Unimplemented
+            | StatusCode::DataLoss
+            | StatusCode::Unauthenticated => Permanent,
+            StatusCode::DeadlineExceeded
+            | StatusCode::ResourceExhausted
+            | StatusCode::Aborted
+            | StatusCode::Internal
+            | StatusCode::Unavailable => Transient,
             StatusCode::Unknown => Unknown,
         }
     }

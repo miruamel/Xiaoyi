@@ -10,7 +10,7 @@
 //! @see crate::core::error
 
 use pretty_assertions::assert_eq;
-use xiaoyi::{XiaoyiError, ErrorKind, Result, Status};
+use xiaoyi::{ErrorKind, Result, Status, XiaoyiError};
 
 #[test]
 fn test_error_kind_variants() {
@@ -43,7 +43,10 @@ fn test_error_creation_with_metadata() {
     assert_eq!(err.kind, ErrorKind::Config);
     assert_eq!(err.message, "missing api key");
     assert_eq!(err.meta.len(), 1);
-    assert_eq!(err.meta[0], ("path".to_string(), "/etc/xiaoyi/config.toml".to_string()));
+    assert_eq!(
+        err.meta[0],
+        ("path".to_string(), "/etc/xiaoyi/config.toml".to_string())
+    );
 }
 
 #[test]

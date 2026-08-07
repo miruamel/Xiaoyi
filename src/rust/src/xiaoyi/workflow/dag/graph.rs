@@ -37,9 +37,9 @@
 //! - Returns error if cycle detected during topological sort.
 //! - Returns error if edge references non-existent node.
 //! - NodeId must be unique within graph.
-use std::collections::{HashMap, HashSet};
-use petgraph::graph::{DiGraph, NodeIndex};
 use petgraph::algo::toposort;
+use petgraph::graph::{DiGraph, NodeIndex};
+use std::collections::{HashMap, HashSet};
 
 /// Unique node identifier.
 ///
@@ -199,8 +199,14 @@ impl DagGraph {
     /// @throw Error if source or target node missing
     /// @since 0.1.0
     pub fn add_edge(&mut self, edge: DagEdge) -> Result<(), String> {
-        let from_idx = self.node_indices.get(&edge.from).ok_or("source node not found")?;
-        let to_idx = self.node_indices.get(&edge.to).ok_or("target node not found")?;
+        let from_idx = self
+            .node_indices
+            .get(&edge.from)
+            .ok_or("source node not found")?;
+        let to_idx = self
+            .node_indices
+            .get(&edge.to)
+            .ok_or("target node not found")?;
         self.graph.add_edge(*from_idx, *to_idx, edge);
         Ok(())
     }
@@ -212,7 +218,10 @@ impl DagGraph {
     /// @since 0.1.0
     pub fn topological_order(&self) -> Result<Vec<NodeId>, String> {
         let order = toposort(&self.graph, None).map_err(|_| "graph contains cycles")?;
-        Ok(order.into_iter().map(|idx| self.graph[idx].id.clone()).collect())
+        Ok(order
+            .into_iter()
+            .map(|idx| self.graph[idx].id.clone())
+            .collect())
     }
 
     /// Get node by ID.

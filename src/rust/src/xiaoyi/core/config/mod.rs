@@ -139,14 +139,20 @@ impl Config {
         let mut current: &serde_json::Value = self
             .data
             .get(key.split('.').next().unwrap_or(""))
-            .ok_or_else(|| XiaoyiError::new(ErrorKind::Config, format!("config key not found: {}", key)))?;
+            .ok_or_else(|| {
+                XiaoyiError::new(ErrorKind::Config, format!("config key not found: {}", key))
+            })?;
         for part in key.split('.').skip(1) {
-            current = current
-                .get(part)
-                .ok_or_else(|| XiaoyiError::new(ErrorKind::Config, format!("config key not found: {}", key)))?;
+            current = current.get(part).ok_or_else(|| {
+                XiaoyiError::new(ErrorKind::Config, format!("config key not found: {}", key))
+            })?;
         }
-        serde_json::from_value(current.clone())
-            .map_err(|e| XiaoyiError::new(ErrorKind::Config, format!("type mismatch for {}: {}", key, e)))
+        serde_json::from_value(current.clone()).map_err(|e| {
+            XiaoyiError::new(
+                ErrorKind::Config,
+                format!("type mismatch for {}: {}", key, e),
+            )
+        })
     }
     /// Check if a key exists.
     ///

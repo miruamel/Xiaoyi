@@ -52,10 +52,7 @@ impl Endianness {
 /// @brief Default: signed, 64-bit, little-endian
 /// @group Domain
 /// @since 0.1.0
-pub const DEFAULT_REP: (IntKind, IntWidth, Endianness) = (
-    IntKind::Signed,
-    IntWidth::W64,
-    Endianness::Little,
-);
+pub const DEFAULT_REP: (IntKind, IntWidth, Endianness) =
+    (IntKind::Signed, IntWidth::W64, Endianness::Little);
 
 use crate::xiaoyi::domain::token::primitive::int::{IntKind, IntWidth};

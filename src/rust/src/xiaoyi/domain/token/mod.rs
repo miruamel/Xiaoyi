@@ -23,6 +23,6 @@ pub mod primitive;
 pub mod syntax;
 
 // Re-exports from primitive
-pub use primitive::{PrimitiveKind, IntKind, IntWidth, IntType, FloatKind};
+pub use primitive::{FloatKind, IntKind, IntType, IntWidth, PrimitiveKind};
 // Re-exports from syntax
 pub use syntax::SyntaxKind;

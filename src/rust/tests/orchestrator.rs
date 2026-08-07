@@ -11,7 +11,7 @@
 
 use pretty_assertions::assert_eq;
 use tokio_test::block_on;
-use xiaoyi::{Orchestrator, AgentBuilder, Config};
+use xiaoyi::{AgentBuilder, Config, Orchestrator};
 
 #[test]
 fn test_orchestrator_new() {
@@ -44,7 +44,11 @@ fn test_orchestrator_clone() {
 async fn test_orchestrator_run() {
     let config = Config::default();
     let orchestrator = Orchestrator::new(config);
-    let agent = AgentBuilder::new(Config::default()).name("test").model("gpt-4").build().unwrap();
+    let agent = AgentBuilder::new(Config::default())
+        .name("test")
+        .model("gpt-4")
+        .build()
+        .unwrap();
 
     let result = orchestrator.run(agent).await;
     assert!(result.is_ok());

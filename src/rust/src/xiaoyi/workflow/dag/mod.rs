@@ -19,4 +19,4 @@
 pub mod graph;
 
 // Re-exports from graph
-pub use graph::{DagGraph as Dag, DagNode, DagEdge, DagGraph};
+pub use graph::{DagEdge, DagGraph as Dag, DagGraph, DagNode};

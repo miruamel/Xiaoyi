@@ -10,7 +10,7 @@
 //! @see crate::core::result
 
 use pretty_assertions::assert_eq;
-use xiaoyi::{Status, Result, ResultExt, XiaoyiError, ErrorKind};
+use xiaoyi::{ErrorKind, Result, ResultExt, Status, XiaoyiError};
 
 #[test]
 fn test_status_variants() {
@@ -43,8 +43,14 @@ fn test_status_display() {
     assert_eq!(format!("{}", Status::NotFound), "NotFound");
     assert_eq!(format!("{}", Status::AlreadyExists), "AlreadyExists");
     assert_eq!(format!("{}", Status::PermissionDenied), "PermissionDenied");
-    assert_eq!(format!("{}", Status::ResourceExhausted), "ResourceExhausted");
-    assert_eq!(format!("{}", Status::FailedPrecondition), "FailedPrecondition");
+    assert_eq!(
+        format!("{}", Status::ResourceExhausted),
+        "ResourceExhausted"
+    );
+    assert_eq!(
+        format!("{}", Status::FailedPrecondition),
+        "FailedPrecondition"
+    );
     assert_eq!(format!("{}", Status::Aborted), "Aborted");
     assert_eq!(format!("{}", Status::OutOfRange), "OutOfRange");
     assert_eq!(format!("{}", Status::Unimplemented), "Unimplemented");
@@ -160,7 +166,10 @@ fn test_result_works_with_xiaoyi_error() {
 #[test]
 fn test_result_ext_into_xiaoyi_error() {
     // Test the custom ResultExt method
-    let std_result: std::result::Result<i32, std::io::Error> = Err(std::io::Error::new(std::io::ErrorKind::NotFound, "file not found"));
+    let std_result: std::result::Result<i32, std::io::Error> = Err(std::io::Error::new(
+        std::io::ErrorKind::NotFound,
+        "file not found",
+    ));
     let xiaoyi_result: Result<i32> = std_result.into_xiaoyi_error();
     assert!(xiaoyi_result.is_err());
     assert_eq!(xiaoyi_result.unwrap_err().kind, ErrorKind::Runtime);

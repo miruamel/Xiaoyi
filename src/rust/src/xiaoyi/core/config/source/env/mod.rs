@@ -80,9 +80,7 @@ impl ConfigSource for EnvSource {
 
         for (key, value) in std::env::vars() {
             if let Some(stripped) = key.strip_prefix(&self.prefix) {
-                let config_key = stripped
-                    .to_lowercase()
-                    .replace("__", ".");
+                let config_key = stripped.to_lowercase().replace("__", ".");
                 result.insert(config_key, serde_json::Value::String(value));
             }
         }

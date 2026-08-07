@@ -26,9 +26,9 @@
 //!     println!("{:?}", token);
 //! }
 //! ```
-pub mod token;
-pub mod scanner;
 pub mod error;
+pub mod scanner;
+pub mod token;
 
 /// Lexer for tokenizing source code.
 ///

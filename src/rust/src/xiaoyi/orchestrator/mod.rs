@@ -26,12 +26,12 @@
 //! orchestrator.run(agent).await?;
 //! ```
 pub mod loop_;
-pub mod policy;
 pub mod monitor;
+pub mod policy;
 
+use crate::xiaoyi::builder::AgentHandle;
 use crate::xiaoyi::core::config::Config;
 use crate::xiaoyi::core::result::Result;
-use crate::xiaoyi::builder::AgentHandle;
 
 /// Orchestrator for running agent loops.
 ///

@@ -178,7 +178,10 @@ pub trait LlmClient: Send + Sync {
     /// @return Stream of partial responses
     /// @throw Llm error on stream failure
     /// @since 0.1.0
-    async fn chat_stream(&self, request: ChatRequest) -> Result<Pin<Box<dyn Stream<Item = Result<ChatResponse>> + Send + Unpin>>>;
+    async fn chat_stream(
+        &self,
+        request: ChatRequest,
+    ) -> Result<Pin<Box<dyn Stream<Item = Result<ChatResponse>> + Send + Unpin>>>;
 
     /// Get provider name for logging/debugging.
     ///

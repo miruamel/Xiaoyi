@@ -33,14 +33,14 @@
 //!   - Rotate keys periodically via key derivation.
 //!   - Vault files should have restricted permissions (600).
 pub mod aes;
-pub mod key;
-pub mod encrypt;
 pub mod decrypt;
+pub mod encrypt;
+pub mod key;
 
 use crate::xiaoyi::core::config::source::ConfigSource;
-use crate::xiaoyi::core::error::{ErrorKind, Result, XiaoyiError};
-use crate::xiaoyi::core::config::source::vault::key::load_key;
 use crate::xiaoyi::core::config::source::vault::decrypt::decrypt as vault_decrypt;
+use crate::xiaoyi::core::config::source::vault::key::load_key;
+use crate::xiaoyi::core::error::{ErrorKind, Result, XiaoyiError};
 use async_trait::async_trait;
 use std::collections::HashMap;
 use std::path::Path;
@@ -85,32 +85,34 @@ impl ConfigSource for VaultSource {
         let path = Path::new(&self.path);
         if !path.exists() {
             if self.required {
-                return Err(XiaoyiError::new(
-                    ErrorKind::Config,
-                    "vault file not found",
-                ).with_meta("path", &self.path));
+                return Err(XiaoyiError::new(ErrorKind::Config, "vault file not found")
+                    .with_meta("path", &self.path));
             }
             return Ok(HashMap::new());
         }
 
-        let encrypted = tokio::fs::read(path).await
-            .map_err(|e| XiaoyiError::new(ErrorKind::Config, "failed to read vault")
+        let encrypted = tokio::fs::read(path).await.map_err(|e| {
+            XiaoyiError::new(ErrorKind::Config, "failed to read vault")
                 .with_meta("path", &self.path)
-                .with_meta("error", &e.to_string()))?;
+                .with_meta("error", &e.to_string())
+        })?;
 
         let key = load_key()?;
-        let decrypted = vault_decrypt(&encrypted, &key)
-            .map_err(|e| XiaoyiError::new(ErrorKind::Config, "vault decryption failed")
+        let decrypted = vault_decrypt(&encrypted, &key).map_err(|e| {
+            XiaoyiError::new(ErrorKind::Config, "vault decryption failed")
                 .with_meta("path", &self.path)
-                .with_meta("error", &e.to_string()))?;
+                .with_meta("error", &e.to_string())
+        })?;
 
-        let content = String::from_utf8(decrypted)
-            .map_err(|e| XiaoyiError::new(ErrorKind::Config, "vault content not valid UTF-8")
-                .with_meta("error", &e.to_string()))?;
+        let content = String::from_utf8(decrypted).map_err(|e| {
+            XiaoyiError::new(ErrorKind::Config, "vault content not valid UTF-8")
+                .with_meta("error", &e.to_string())
+        })?;
 
-        toml::from_str(&content)
-            .map_err(|e| XiaoyiError::new(ErrorKind::Config, "vault content parse failed")
-                .with_meta("error", &e.to_string()))
+        toml::from_str(&content).map_err(|e| {
+            XiaoyiError::new(ErrorKind::Config, "vault content parse failed")
+                .with_meta("error", &e.to_string())
+        })
     }
 }
 

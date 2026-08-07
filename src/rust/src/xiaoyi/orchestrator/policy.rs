@@ -37,6 +37,9 @@ impl Default for Policy {
 /// @param policy Execution policy
 /// @return Continue flag
 /// @since 0.1.0
-pub fn should_continue(state: &crate::xiaoyi::orchestrator::loop_::LoopState, policy: &Policy) -> bool {
+pub fn should_continue(
+    state: &crate::xiaoyi::orchestrator::loop_::LoopState,
+    policy: &Policy,
+) -> bool {
     state.iterations < policy.max_iterations
 }

@@ -33,12 +33,12 @@
 //! @see crate::orchestrator
 //! @see crate::gateway
 //! @module xiaoyi
+pub mod builder;
 pub mod core;
 pub mod domain;
+pub mod gateway;
 pub mod lexer;
 pub mod llm;
 pub mod memory;
-pub mod workflow;
-pub mod builder;
 pub mod orchestrator;
-pub mod gateway;
+pub mod workflow;

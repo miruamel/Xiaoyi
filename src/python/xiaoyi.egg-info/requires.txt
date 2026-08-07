@@ -1,0 +1,9 @@
+cryptography>=42.0
+
+[dev]
+pytest>=8.0
+pytest-asyncio>=0.23
+pytest-cov>=4.1
+ruff>=0.4
+mypy>=1.10
+pip-audit>=2.7

@@ -19,13 +19,13 @@
 //! @see crate::domain::token
 //! @see crate::domain::token::primitive::int
 //! @see crate::domain::token::primitive::float
-pub mod int;
-pub mod float;
 pub mod bool;
+pub mod float;
+pub mod int;
 pub mod string;
 
 // Re-exports from int
-pub use int::{IntKind, IntWidth, IntType};
+pub use int::{IntKind, IntType, IntWidth};
 // Re-exports from float
 pub use float::FloatKind;
 

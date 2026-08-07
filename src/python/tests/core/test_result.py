@@ -226,12 +226,6 @@ class TestResultIntegration:
 
     def test_complex_chain(self):
         """Test complex operation chain."""
-        result = (
-            ok(10)
-            |> (lambda r: and_then(r, lambda x: ok(x + 5)))
-            |> (lambda r: map(r, lambda x: x * 2))
-            |> (lambda r: or_else(r, lambda _: ok(0)))
-        )
         # Using function composition instead of pipe operator
         result = ok(10)
         result = and_then(result, lambda x: ok(x + 5))
