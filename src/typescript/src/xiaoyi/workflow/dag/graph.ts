@@ -70,6 +70,13 @@ export class DagBuilder {
     const edges = this.edges.get(from) ?? [];
     edges.push(to);
     this.edges.set(from, edges);
+    // Track dependencies on target node
+    const targetNode = this.nodes.get(to);
+    if (targetNode) {
+      const deps = targetNode.dependencies ?? [];
+      if (!deps.includes(from)) deps.push(from);
+      this.nodes.set(to, { ...targetNode, dependencies: deps });
+    }
     return this;
   }
 
@@ -132,6 +139,8 @@ export interface DagNode {
   id: string;
   /** Execution function. */
   execute: DagNodeExecute;
+  /** Dependencies (upstream node IDs). */
+  dependencies?: string[];
 }
 
 /**

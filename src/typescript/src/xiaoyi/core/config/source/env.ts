@@ -51,14 +51,19 @@ export class EnvSource implements ConfigSource {
     this.parser = options.parser ?? this.defaultParser.bind(this);
   }
 
-  /** Default value parser - parses all valid JSON. */
+  /** Default value parser - parses JSON objects and arrays, keeps primitives as strings. */
   private defaultParser(value: string): unknown {
-    try {
-      return JSON.parse(value);
-    } catch {
-      // Return as string if not valid JSON
-      return value;
+    const trimmed = value.trim();
+    // Only parse if it looks like an object or array
+    if ((trimmed.startsWith("{") && trimmed.endsWith("}")) || (trimmed.startsWith("[") && trimmed.endsWith("]"))) {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return value;
+      }
     }
+    // Keep primitives (numbers, booleans, null) and other strings as-is
+    return value;
   }
 
   /**

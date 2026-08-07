@@ -59,11 +59,16 @@ export function createNode<TInput, TOutput>(
 ): DagNode {
   return {
     id,
-    execute: async (inputs) => {
+    execute: async (input) => {
       const controller = new AbortController();
+      // Graph executor passes { upstreamNodeId: result }
+      // Tests pass { inputs: actualValue, nodeId, dagId } or primitives
+      const inputsMap = input && typeof input === "object" && "inputs" in input
+        ? (input as { inputs: unknown }).inputs
+        : input;
       const context: NodeContext = {
         nodeId: id,
-        inputs: inputs as Record<string, unknown>,
+        inputs: inputsMap as Record<string, unknown>,
         executionId: crypto.randomUUID(),
         signal: controller.signal,
       };
@@ -98,8 +103,12 @@ export function transformNode<TInput, TOutput>(
   transform: (input: TInput) => Promise<TOutput>
 ): DagNode {
   return createNode(id, async ({ inputs }) => {
-    const [firstKey] = Object.keys(inputs);
-    return transform(inputs[firstKey] as TInput);
+    // Graph executor passes { upstreamNodeId: result }
+    // Tests (with createNode fix) pass raw value directly
+    const inputValue = inputs && typeof inputs === "object" && !Array.isArray(inputs)
+      ? inputs[Object.keys(inputs)[0]]
+      : inputs;
+    return transform(inputValue as TInput);
   });
 }
 
