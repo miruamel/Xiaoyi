@@ -1,0 +1,280 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., v0.1.0)'
+        required: true
+        type: string
+      dry_run:
+        description: 'Dry run (no publish)'
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  packages: write
+  id-token: write
+
+env:
+  RUST_VERSION: '1.82'
+  NODE_VERSION: '20'
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  # Validate version and prepare
+  prepare:
+    name: Prepare Release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event.inputs.version }}" != "" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            # Auto-determine from Cargo.toml
+            VERSION=$(grep '^version' src/rust/Cargo.toml | head -1 | cut -d'"' -f2)
+            VERSION="v$VERSION"
+          fi
+          
+          # Validate semver
+          if [[ ! $VERSION =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$ ]]; then
+            echo "Invalid version format: $VERSION"
+            exit 1
+          fi
+          
+          echo "version=${VERSION#v}" >> $GITHUB_OUTPUT
+          echo "tag=$VERSION" >> $GITHUB_OUTPUT
+          echo "Releasing version: $VERSION"
+
+      - name: Check if tag exists
+        run: |
+          if git rev-parse "${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
+            echo "Tag ${{ steps.version.outputs.tag }} already exists!"
+            exit 1
+          fi
+
+  # Rust crate release
+  rust-release:
+    name: Release Rust Crate
+    needs: prepare
+    runs-on: ubuntu-latest
+    if: ${{ !inputs.dry_run }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            src/rust/target
+          key: ${{ runner.os }}-cargo-release-${{ hashFiles('src/rust/Cargo.lock') }}
+
+      - name: Update version in Cargo.toml
+        run: |
+          cd src/rust
+          sed -i "s/^version = \".*\"/version = \"${{ needs.prepare.outputs.version }}\"/" Cargo.toml
+          cargo check
+
+      - name: Build release
+        run: |
+          cd src/rust
+          cargo build --release --features python,nodejs
+
+      - name: Publish to crates.io
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          cd src/rust
+          cargo publish --features python,nodejs
+
+      - name: Create Git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ needs.prepare.outputs.tag }}" -m "Release ${{ needs.prepare.outputs.tag }}"
+          git push origin "${{ needs.prepare.outputs.tag }}"
+
+  # TypeScript package release
+  typescript-release:
+    name: Release TypeScript Package
+    needs: prepare
+    runs-on: ubuntu-latest
+    if: ${{ !inputs.dry_run }}
+    defaults:
+      run:
+        working-directory: src/typescript
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+          cache-dependency-path: src/typescript/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Update version
+        run: npm version ${{ needs.prepare.outputs.version }} --no-git-tag-version
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public
+
+  # Python package release
+  python-release:
+    name: Release Python Package
+    needs: prepare
+    runs-on: ubuntu-latest
+    if: ${{ !inputs.dry_run }}
+    defaults:
+      run:
+        working-directory: src/python
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install build tools
+        run: pip install -U pip build twine
+
+      - name: Update version
+        run: |
+          sed -i "s/^version = \".*\"/version = \"${{ needs.prepare.outputs.version }}\"/" pyproject.toml
+
+      - name: Build package
+        run: python -m build
+
+      - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: twine upload dist/*
+
+  # Create GitHub Release
+  github-release:
+    name: Create GitHub Release
+    needs: [prepare, rust-release, typescript-release, python-release]
+    runs-on: ubuntu-latest
+    if: ${{ !inputs.dry_run }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get previous tag
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -n "$PREV_TAG" ]; then
+            CHANGELOG=$(git log --pretty=format:"- %s (%an)" $PREV_TAG..HEAD)
+          else
+            CHANGELOG=$(git log --pretty=format:"- %s (%an)")
+          fi
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ needs.prepare.outputs.tag }}
+          name: Release ${{ needs.prepare.outputs.tag }}
+          body: |
+            ## Changes
+            ${{ steps.changelog.outputs.changelog }}
+            
+            ## Installation
+            
+            ### Rust
+            \`\`\`toml
+            [dependencies]
+            xiaoyi = { version = "${{ needs.prepare.outputs.version }}", features = ["full"] }
+            \`\`\`
+            
+            ### Python
+            \`\`\`bash
+            pip install xiaoyi-py==${{ needs.prepare.outputs.version }}
+            \`\`\`
+            
+            ### TypeScript
+            \`\`\`bash
+            npm install xiaoyi-ts@${{ needs.prepare.outputs.version }}
+            \`\`\`
+          draft: false
+          prerelease: false
+          generate_release_notes: false
+
+      - name: Update CHANGELOG.md
+        run: |
+          # Prepend new release to CHANGELOG.md
+          NEW_ENTRY="## [${{ needs.prepare.outputs.version }}] - $(date +%Y-%m-%d)\n\n${{ steps.changelog.outputs.changelog }}\n"
+          sed -i "1s/^/$NEW_ENTRY\n/" CHANGELOG.md
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git commit -m "chore: update CHANGELOG.md for ${{ needs.prepare.outputs.tag }}"
+          git push
+
+  # Dry run summary
+  dry-run:
+    name: Dry Run Summary
+    needs: prepare
+    runs-on: ubuntu-latest
+    if: ${{ inputs.dry_run }}
+    steps:
+      - name: Show release plan
+        run: |
+          echo "🔍 DRY RUN - Release Plan for ${{ needs.prepare.outputs.tag }}"
+          echo ""
+          echo "This would:"
+          echo "  1. Update version to ${{ needs.prepare.outputs.version }} in all Cargo.toml, package.json, pyproject.toml"
+          echo "  2. Build and test all packages"
+          echo "  3. Publish to crates.io (Rust)"
+          echo "  4. Publish to npm (TypeScript)"
+          echo "  5. Publish to PyPI (Python)"
+          echo "  6. Create Git tag ${{ needs.prepare.outputs.tag }}"
+          echo "  7. Create GitHub Release with changelog"
+          echo "  8. Update CHANGELOG.md"
+          echo ""
+          echo "To actually release, re-run with dry_run=false"

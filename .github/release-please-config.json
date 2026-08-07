@@ -1,0 +1,19 @@
+{
+  "release-type": "simple",
+  "packages": {
+    "": {
+      "release-type": "simple",
+      "changelog-path": "CHANGELOG.md",
+      "version-file": "src/rust/Cargo.toml",
+      "tag-name": "v${version}",
+      "extra-files": [
+        "src/typescript/package.json",
+        "src/python/pyproject.toml"
+      ]
+    }
+  },
+  "plugins": [
+    "release-please-plugin-github"
+  ],
+  "bootstrap-sha": "HEAD"
+}
