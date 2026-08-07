@@ -30,7 +30,10 @@ fn json_value_to_pyobject<'py>(
 ) -> PyResult<Bound<'py, PyAny>> {
     match val {
         serde_json::Value::Null => Ok(py.None().into_bound(py).into_any()),
-        serde_json::Value::Bool(b) => Ok(pyo3::types::PyBool::new(py, *b).into_any()),
+        serde_json::Value::Bool(b) => {
+            let py_bool = pyo3::types::PyBool::new(py, *b);
+            Ok(py_bool.as_any().clone())
+        }
         serde_json::Value::Number(n) => {
             if let Some(i) = n.as_i64() {
                 Ok(i.into_pyobject(py)?.into_any())

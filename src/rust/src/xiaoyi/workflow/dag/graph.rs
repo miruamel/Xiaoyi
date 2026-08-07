@@ -204,7 +204,7 @@ impl DagGraph {
     pub fn node_id(&self, idx: NodeIndex) -> Option<NodeId> {
         self.node_indices
             .iter()
-            .find(|(_, &v)| v == idx)
+            .find(|(_, v)| *v == &idx)
             .map(|(k, _)| k.clone())
     }
 
