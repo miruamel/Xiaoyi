@@ -29,6 +29,7 @@
 //!     Ok(())
 //! }
 //! ```
+pub mod handler;
 pub mod status;
 
 use crate::xiaoyi::core::error::{ErrorKind, XiaoyiError};

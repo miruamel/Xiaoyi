@@ -212,4 +212,6 @@ impl From<serde_json::Error> for XiaoyiError {
 /// @brief Standard Result type for Xiaoyi operations
 /// @since 0.1.0
 /// @author Miruamel
-pub type Result<T> = std::result::Result<T, XiaoyiError>;
+pub type Result<T, E = XiaoyiError> = std::result::Result<T, E>;
+
+pub mod context;

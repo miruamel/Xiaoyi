@@ -20,6 +20,7 @@
 //! @see crate::lexer
 pub mod keyword;
 pub mod operator;
+pub mod punctuation;
 
 /// Syntax token kind.
 ///

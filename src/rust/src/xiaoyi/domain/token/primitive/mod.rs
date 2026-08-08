@@ -20,6 +20,7 @@
 //! @see crate::domain::token::primitive::int
 //! @see crate::domain::token::primitive::float
 pub mod bool;
+pub mod bytes;
 pub mod float;
 pub mod int;
 pub mod string;
