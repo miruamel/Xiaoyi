@@ -16,6 +16,7 @@
 //! let registry = ToolRegistry::default();
 //! registry.register(my_plugin).unwrap();
 
+pub mod discovery;
 pub mod plugin;
 pub mod registry;
 
