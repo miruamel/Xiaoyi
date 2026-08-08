@@ -14,15 +14,23 @@
 //! @since 0.1.0
 //! @author Miruamel
 //! @see crate::xiaoyi::core
+pub mod env;
+pub mod fs;
 pub mod id;
 pub mod json;
+pub mod math;
+pub mod net;
 pub mod retry;
 pub mod string;
 pub mod time;
 pub mod validation;
 
+pub use env::{get_env_int_or, get_env_or};
+pub use fs::{canonicalize, read_file, write_file};
 pub use id::generate_id;
 pub use json::{from_json, get_string_field, is_json_object, to_json};
+pub use math::{clamp, lerp};
+pub use net::HttpClientConfig;
 pub use retry::RetryConfig;
 pub use string::{slugify, truncate};
 pub use time::{format_duration, now_millis};
