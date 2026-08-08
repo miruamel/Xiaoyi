@@ -42,3 +42,11 @@ docs/_build/
 target/
 Cargo.lock
 *.png
+
+# Docusaurus website (build artifacts only; source lives in website/)
+website/node_modules/
+website/.docusaurus/
+website/build/
+
+# Rust doc build output
+target/doc/
