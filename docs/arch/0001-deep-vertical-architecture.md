@@ -21,23 +21,98 @@ We adopt a **deep vertical architecture** where each domain (core, domain, workf
 3. **Domain Isolation**: Domains communicate only through well-defined interfaces
 4. **Cross-Language Consistency**: Same vertical structure mirrored in all three languages
 
-### Layer Structure Example (Core Config)
+### Implemented Layer Structure
 
 ```
 core/
-  config/                    # Layer 1: Domain entry point
+  config/                    # Layer 1: Configuration domain
     source/                  # Layer 2: Source abstraction
       env/                   # Layer 3: Environment variables
       file/                  # Layer 3: File-based config
-        path/                # Layer 4: Path resolution
-        absolute/            # Layer 5: Absolute path handling
-        unix/                # Layer 5: Unix path semantics
-        norm/                # Layer 5: Path normalization
       vault/                 # Layer 3: Secret management
-        encrypt/             # Layer 4: Encryption
+        aes/                 # Layer 4: AES implementation
         decrypt/             # Layer 4: Decryption
-        aes/                 # Layer 5: AES implementation
-        key/                 # Layer 5: Key management
+        encrypt/             # Layer 4: Encryption
+        key/                 # Layer 4: Key management
+  error/                     # Layer 1: Error domain
+    context/                 # Layer 2: Error context helpers
+  result/                    # Layer 1: Result domain
+    handler/                 # Layer 2: Status handlers
+    status/                  # Layer 2: Status codes
+
+domain/
+  token/                     # Layer 1: Token domain
+    primitive/               # Layer 2: Primitive types
+      bool/                  # Layer 3: Boolean
+      bytes/                 # Layer 3: Bytes/base64
+      float/                 # Layer 3: Float
+      int/                   # Layer 3: Integer
+      string/                # Layer 3: String
+    syntax/                  # Layer 2: Syntax tokens
+      keyword/               # Layer 3: Keywords
+      operator/              # Layer 3: Operators
+      punctuation/           # Layer 3: Punctuation
+
+workflow/
+  dag/                       # Layer 1: Workflow domain
+    graph/                   # Layer 2: Graph model
+    node/                    # Layer 2: Node model
+    edge/                    # Layer 2: Edge model
+
+memory/
+  stm/                       # Layer 1: Short-term memory
+    cache/                   # Layer 2: LRU cache
+  ltm/                       # Layer 1: Long-term memory
+    vector/                  # Layer 2: Vector store
+    graph/                   # Layer 2: Knowledge graph
+
+utils/                       # Shared vertical utilities
+  env/                       # Environment helpers
+  fs/                        # Filesystem helpers
+  id/                        # ID generation
+  json/                      # JSON helpers
+  math/                      # Math helpers
+  net/                       # HTTP client config
+  retry/                     # Retry configuration
+  string/                    # String helpers
+  time/                      # Time helpers
+  validation/                # Input validation
+
+builder/                     # Layer 1: Builder domain
+  ast/                       # Layer 2: AST model
+  codegen/                   # Layer 2: Code generation
+  formatter/                 # Layer 2: Formatting
+  template/                  # Layer 2: Templates
+  validator/                 # Layer 2: Validation
+
+orchestrator/                # Layer 1: Orchestration domain
+  loop_/                     # Layer 2: Agent loop
+  monitor/                   # Layer 2: Execution monitoring
+  planner/                   # Layer 2: Goal decomposition
+  policy/                    # Layer 2: Decision policies
+  recovery/                  # Layer 2: Error recovery
+
+critic/                      # Layer 1: Review domain
+  aggregator/                # Layer 2: Meta-critic aggregation
+  cache/                     # Layer 2: Semantic cache
+  large_llm/                 # Layer 2: Large LLM critics
+  model_router/              # Layer 2: Model routing
+  rules/                     # Layer 2: Fast-path rules
+  small_llm/                 # Layer 2: Small LLM critics
+
+evaluator/                   # Layer 1: Evaluation domain
+  analysis/                  # Layer 2: Static analysis
+  benchmark/                 # Layer 2: Benchmarks
+  build/                     # Layer 2: Build checks
+  feedback/                  # Layer 2: Feedback formulation
+  gates/                     # Layer 2: Quality gates
+  sandbox/                   # Layer 2: Sandbox execution
+  test/                      # Layer 2: Test runners
+
+gateway/                     # Layer 1: Gateway domain
+knowledge/                   # Layer 1: Knowledge domain
+monitoring/                  # Layer 1: Monitoring domain
+resilience/                  # Layer 1: Resilience domain
 ```
 
 ## Consequences
