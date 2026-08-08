@@ -5,6 +5,7 @@
 //! @author Miruamel
 //! @see crate::knowledge::graph
 
+pub mod commit;
 pub mod scanner;
 
 pub use scanner::RepoScanner;

@@ -27,6 +27,7 @@
 //!
 
 pub mod alert;
+pub mod channel;
 pub mod notifier;
 pub mod rule;
 

@@ -8,6 +8,7 @@ use crate::xiaoyi::core::error::Result;
 use async_trait::async_trait;
 
 pub mod in_memory;
+pub mod remote;
 
 /// Vector storage trait for managing vector embeddings and associated payloads.
 #[async_trait]
