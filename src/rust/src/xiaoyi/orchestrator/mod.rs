@@ -46,7 +46,9 @@
 //! ```
 pub mod loop_;
 pub mod monitor;
+pub mod planner;
 pub mod policy;
+pub mod recovery;
 
 use crate::xiaoyi::builder::AgentHandle;
 use crate::xiaoyi::core::config::Config;

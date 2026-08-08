@@ -31,7 +31,9 @@
 /// ```
 pub mod ast;
 pub mod codegen;
+pub mod formatter;
 pub mod template;
+pub mod validator;
 
 use crate::xiaoyi::core::config::Config;
 use crate::xiaoyi::core::error::Result;
