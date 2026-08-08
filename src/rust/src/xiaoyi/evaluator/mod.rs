@@ -46,7 +46,7 @@ use crate::xiaoyi::core::error::Result;
 ///
 /// @brief Full evaluation toolchain orchestrator
 /// @group AI Evaluation
-//! @since 0.1.0
+/// @since 0.1.0
 #[derive(Debug, Clone)]
 pub struct Evaluator {
     // Configuration for evaluator

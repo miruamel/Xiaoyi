@@ -19,7 +19,7 @@ use crate::xiaoyi::evaluator::{TestResult, TestType};
 ///
 /// @brief Test execution settings
 /// @group AI Evaluation
-//! @since 0.1.0
+/// @since 0.1.0
 #[derive(Debug, Clone)]
 pub struct TestConfig {
     /// Test command
@@ -50,7 +50,7 @@ impl Default for TestConfig {
 ///
 /// @brief Runs unit, property, and integration tests
 /// @group AI Evaluation
-//! @since 0.1.0
+/// @since 0.1.0
 #[derive(Debug, Clone)]
 pub struct TestRunner {
     config: TestConfig,

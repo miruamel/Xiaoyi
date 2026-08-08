@@ -191,6 +191,21 @@ impl std::error::Error for XiaoyiError {
         None
     }
 }
+impl From<std::io::Error> for XiaoyiError {
+    fn from(err: std::io::Error) -> Self {
+        Self::new(ErrorKind::Io, err.to_string())
+    }
+}
+impl From<regex::Error> for XiaoyiError {
+    fn from(err: regex::Error) -> Self {
+        Self::new(ErrorKind::Tool, err.to_string())
+    }
+}
+impl From<serde_json::Error> for XiaoyiError {
+    fn from(err: serde_json::Error) -> Self {
+        Self::new(ErrorKind::Config, err.to_string())
+    }
+}
 
 /// Type alias for Results using XiaoyiError.
 ///

@@ -19,7 +19,7 @@ use crate::xiaoyi::evaluator::SandboxResult;
 ///
 /// @brief Sandbox execution settings
 /// @group AI Evaluation
-//! @since 0.1.0
+/// @since 0.1.0
 #[derive(Debug, Clone)]
 pub struct SandboxConfig {
     /// Docker image to use
@@ -53,7 +53,7 @@ impl Default for SandboxConfig {
 ///
 /// @brief Safe code execution environment
 /// @group AI Evaluation
-//! @since 0.1.0
+/// @since 0.1.0
 #[derive(Debug, Clone)]
 pub struct Sandbox {
     config: SandboxConfig,
@@ -75,7 +75,7 @@ impl Sandbox {
     /// @param language Programming language
     /// @return Execution result
     /// @since 0.1.0
-    pub async fn execute(&self, code: &str, language: &str) -> Result<SandboxResult> {
+    pub async fn execute(&self, _code: &str, language: &str) -> Result<SandboxResult> {
         // In production, this would use Docker/containerd to run code
         // For now, return a mock result
         let result = SandboxResult {

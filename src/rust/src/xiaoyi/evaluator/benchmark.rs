@@ -19,7 +19,7 @@ use crate::xiaoyi::evaluator::{BenchmarkResult, TokenUsage};
 ///
 /// @brief Benchmark execution settings
 /// @group AI Evaluation
-//! @since 0.1.0
+/// @since 0.1.0
 #[derive(Debug, Clone)]
 pub struct BenchmarkConfig {
     /// Number of iterations
@@ -50,7 +50,7 @@ impl Default for BenchmarkConfig {
 ///
 /// @brief Runs performance and cost benchmarks
 /// @group AI Evaluation
-//! @since 0.1.0
+/// @since 0.1.0
 #[derive(Debug, Clone)]
 pub struct BenchmarkRunner {
     config: BenchmarkConfig,

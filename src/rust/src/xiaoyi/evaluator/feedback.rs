@@ -13,14 +13,13 @@
 //! @see crate::evaluator::gates
 //! @see crate::critic::aggregator
 
-use crate::xiaoyi::core::error::Result;
-use crate::xiaoyi::evaluator::{EvaluationResult, GateResult, AnalysisFinding, TestResult};
+use crate::xiaoyi::evaluator::{EvaluationResult, GateResult, AnalysisFinding};
 
 /// Feedback configuration.
 ///
 /// @brief Feedback generation settings
 /// @group AI Evaluation
-//! @since 0.1.0
+/// @since 0.1.0
 #[derive(Debug, Clone)]
 pub struct FeedbackConfig {
     /// Include passing tests in feedback
@@ -48,7 +47,7 @@ impl Default for FeedbackConfig {
 ///
 /// @brief Formulates actionable feedback from evaluation results
 /// @group AI Evaluation
-//! @since 0.1.0
+/// @since 0.1.0
 #[derive(Debug, Clone)]
 pub struct FeedbackFormulator {
     config: FeedbackConfig,

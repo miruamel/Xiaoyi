@@ -32,6 +32,7 @@ futures = "0.3"
 clap = { version = "4.5", features = ["derive"] }
 regex = "1.10"
 md5 = "0.7"
+uuid = { version = "1.16", features = ["v4"] }
 
 # Config
 config = "0.13"

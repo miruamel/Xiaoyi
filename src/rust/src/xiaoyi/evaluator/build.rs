@@ -19,7 +19,7 @@ use crate::xiaoyi::evaluator::BuildResult;
 ///
 /// @brief Build system settings
 /// @group AI Evaluation
-//! @since 0.1.0
+/// @since 0.1.0
 #[derive(Debug, Clone)]
 pub struct BuildConfig {
     /// Build system (cargo, npm, make, etc.)
@@ -50,7 +50,7 @@ impl Default for BuildConfig {
 ///
 /// @brief Compiles and verifies builds
 /// @group AI Evaluation
-//! @since 0.1.0
+/// @since 0.1.0
 #[derive(Debug, Clone)]
 pub struct BuildExecutor {
     config: BuildConfig,

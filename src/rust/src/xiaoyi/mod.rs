@@ -42,6 +42,7 @@ pub mod domain;
 pub mod evaluator;
 pub mod gateway;
 pub mod knowledge;
+pub mod monitoring;
 pub mod lexer;
 pub mod llm;
 pub mod memory;
@@ -51,6 +52,13 @@ pub mod workflow;
 // Knowledge re-exports
 pub use knowledge::{
     EntryKind, KnowledgeBase, KnowledgeConfig, KnowledgeEntry, KnowledgeStats,
+};
+
+// Monitoring re-exports
+pub use monitoring::{
+    Alert, AlertManager, AlertRule, AlertSeverity, Notifier, Budget, CostEstimate, CostTracker,
+    Counter, Gauge, Histogram, HistogramSnapshot, MetricRegistry, Span, SpanContext, SpanKind,
+    TraceExporter, Tracer,
 };
 
 // Re-exports for public API

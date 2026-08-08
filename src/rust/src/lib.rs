@@ -55,6 +55,12 @@ pub use xiaoyi::orchestrator::Orchestrator;
 pub use xiaoyi::knowledge::{
     EntryKind, KnowledgeBase, KnowledgeConfig, KnowledgeEntry, KnowledgeStats,
 };
+
+pub use xiaoyi::monitoring::{
+    Alert, AlertManager, AlertRule, AlertSeverity, Notifier, Budget, CostEstimate, CostTracker,
+    Counter, Gauge, Histogram, HistogramSnapshot, MetricRegistry, Span, SpanContext, SpanKind,
+    TraceExporter, Tracer,
+};
 // Module trees used by integration tests
 pub use xiaoyi::workflow;
 pub use xiaoyi::llm;

@@ -14,13 +14,13 @@
 //! @see crate::critic::rules
 
 use crate::xiaoyi::core::error::Result;
-use crate::xiaoyi::evaluator::{AnalysisFinding, Severity};
+use crate::xiaoyi::evaluator::AnalysisFinding;
 
 /// Analysis tool configuration.
 ///
 /// @brief Static analysis tool settings
 /// @group AI Evaluation
-//! @since 0.1.0
+/// @since 0.1.0
 #[derive(Debug, Clone)]
 pub struct AnalysisConfig {
     /// Enable SAST
@@ -51,7 +51,7 @@ impl Default for AnalysisConfig {
 ///
 /// @brief Runs SAST, DAST, secret scanning, and AST analysis
 /// @group AI Evaluation
-//! @since 0.1.0
+/// @since 0.1.0
 #[derive(Debug, Clone)]
 pub struct AnalysisEngine {
     config: AnalysisConfig,

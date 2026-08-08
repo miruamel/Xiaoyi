@@ -13,7 +13,6 @@
 //! @see crate::evaluator::analysis
 //! @see crate::critic::aggregator
 
-use crate::xiaoyi::core::error::Result;
 use crate::xiaoyi::evaluator::{GateResult, GateStatus, Severity};
 use crate::xiaoyi::evaluator::AnalysisFinding;
 
@@ -21,7 +20,7 @@ use crate::xiaoyi::evaluator::AnalysisFinding;
 ///
 /// @brief Quality gate thresholds and rules
 /// @group AI Evaluation
-//! @since 0.1.0
+/// @since 0.1.0
 #[derive(Debug, Clone)]
 pub struct GateConfig {
     /// Minimum test coverage (%)
@@ -58,7 +57,7 @@ impl Default for GateConfig {
 ///
 /// @brief Evaluates quality gates against results
 /// @group AI Evaluation
-//! @since 0.1.0
+/// @since 0.1.0
 #[derive(Debug, Clone)]
 pub struct GateEvaluator {
     config: GateConfig,
