@@ -6,16 +6,61 @@
 [![TypeScript](https://img.shields.io/badge/typescript-5.0%2B-blue.svg)](https://www.typescriptlang.org)
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-green.svg)](LICENSE)
 
-**Xiaoyi is an open-source AI agent framework for building autonomous agents.**
+**Xiaoyi is an open-source AI agent framework with a deeply vertical architecture.**
 
-It lets you build agents that plan, review, evaluate, and recover from errors with minimal supervision. A Rust core handles execution, with Python and TypeScript SDKs for scripting and integration.
+The Rust core is organized into deep vertical layers — each domain grows its own submodules instead of flattening concerns. That means you get fine-grained separation from primitives like token syntax and config sources all the way up to orchestration, monitoring, and bindings.
 
-## What you can build
+## Deeply vertical architecture
 
-- Autonomous coding agents that write, review, and iterate on code
-- Workflow pipelines with DAG-based task orchestration
-- Agents that use multiple LLM providers (OpenAI, Anthropic, Ollama)
-- Systems with persistent memory, tool use, and quality gates
+```
+xiaoyi/
+├── core/
+│   └── config/
+│       └── source/
+│           ├── env/
+│           ├── file/
+│           └── vault/
+│               ├── aes/
+│               ├── decrypt/
+│               ├── encrypt/
+│               └── key/
+├── domain/
+│   └── token/
+│       ├── primitive/
+│       └── syntax/
+├── workflow/
+│   └── dag/
+│       ├── graph/
+│       ├── node/
+│       └── edge/
+├── memory/
+│   ├── stm/
+│   │   └── cache/
+│   └── ltm/
+│       ├── vector/
+│       └── graph/
+├── utils/
+│   ├── env/
+│   ├── fs/
+│   ├── id/
+│   ├── json/
+│   ├── math/
+│   ├── net/
+│   ├── retry/
+│   ├── string/
+│   ├── time/
+│   └── validation/
+├── builder/
+├── critic/
+├── evaluator/
+├── gateway/
+├── knowledge/
+├── monitoring/
+├── orchestrator/
+└── resilience/
+```
+
+Each slice owns its own helpers, tests, and docs.
 
 ## Quick start
 
