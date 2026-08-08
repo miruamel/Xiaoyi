@@ -38,6 +38,7 @@
 //!   - Use hardware security module (HSM) in production.
 //!   - Rotate keys periodically; re-encrypt vault on rotation.
 //!   - Never commit keys to version control.
+use base64::{engine::general_purpose, Engine as _};
 use crate::xiaoyi::core::error::{ErrorKind, Result, XiaoyiError};
 
 /// Load encryption key from environment.
@@ -49,7 +50,7 @@ pub fn load_key() -> Result<[u8; 32]> {
     let key_b64 = std::env::var("XIAOYI_VAULT_KEY")
         .map_err(|_| XiaoyiError::new(ErrorKind::Config, "XIAOYI_VAULT_KEY not set"))?;
 
-    let key_bytes = base64::decode(&key_b64).map_err(|e| {
+    let key_bytes = general_purpose::STANDARD.decode(&key_b64).map_err(|e| {
         XiaoyiError::new(ErrorKind::Config, "XIAOYI_VAULT_KEY invalid base64")
             .with_meta("error", &e.to_string())
     })?;

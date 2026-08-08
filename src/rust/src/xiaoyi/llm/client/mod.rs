@@ -21,24 +21,24 @@
 //! # Example
 //!
 //! ```no_run
-//! use xiaoyi::llm::client::{OpenAiClient, LlmClient, ChatRequest, ChatMessage, MessageRole};
+//! use xiaoyi::llm::client::{LlmClient, ChatRequest, ChatMessage, MessageRole};
 //!
 //! #[tokio::main]
 //! async fn main() -> anyhow::Result<()> {
-//!     let client = OpenAiClient::new(std::env::var("OPENAI_API_KEY")?);
-//!     let request = ChatRequest {
-//!         model: "gpt-4o-mini".into(),
-//!         messages: vec![ChatMessage { role: MessageRole::User, content: "Hello!".into(), name: None }],
-//!         temperature: Some(0.7),
-//!         max_tokens: Some(100),
-//!         stream: false,
-//!     };
-//!     let resp = client.chat(request).await?;
-//!     println!("{}", resp.choices[0].message.content);
+//!     // Example using a custom client implementing LlmClient
+//!     // let client = MyCustomClient::new(std::env::var("API_KEY")?);
+//!     // let request = ChatRequest {
+//!     //     model: "model-name".into(),
+//!     //     messages: vec![ChatMessage { role: MessageRole::User, content: "Hello!".into(), name: None }],
+//!     //     temperature: Some(0.7),
+//!     //     max_tokens: Some(100),
+//!     //     stream: false,
+//!     // };
+//!     // let resp = client.chat(request).await?;
+//!     // println!("{}", resp.choices[0].message.content);
 //!     Ok(())
 //! }
 //! ```
-//!
 //! # Providers
 //!
 //! | Provider | Module | Env Var |
@@ -48,7 +48,6 @@
 //! | Ollama | `ollama` | `OLLAMA_HOST` |
 
 use crate::xiaoyi::core::error::Result;
-use crate::xiaoyi::core::result::ResultExt;
 use async_trait::async_trait;
 use futures::Stream;
 use serde::{Deserialize, Serialize};

@@ -39,7 +39,7 @@
 //! - NodeId must be unique within graph.
 use petgraph::algo::toposort;
 use petgraph::graph::{DiGraph, NodeIndex};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 /// Unique node identifier.
 ///

@@ -25,5 +25,3 @@ pub mod vault;
 
 pub use crate::xiaoyi::core::config::ConfigSource;
 
-use crate::xiaoyi::core::error::Result;
-use std::collections::HashMap;

@@ -11,7 +11,7 @@
 //! @author Miruamel
 //! @see crate::core::error
 
-use crate::xiaoyi::core::error::{ErrorKind, Result, XiaoyiError};
+use crate::xiaoyi::core::error::{ErrorKind, XiaoyiError};
 
 /// Lexical error type.
 ///

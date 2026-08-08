@@ -43,27 +43,10 @@ jobs:
           cd src/rust
           cargo doc --all-features --no-deps --document-private-items
 
-      - name: Generate TypeScript documentation
-        run: |
-          cd src/typescript
-          npm install
-          npm run docs || echo "No docs script, skipping"
-      - name: Generate Python documentation
-        run: |
-          cd src/python
-          pip install -U pip pdoc
-          pdoc -o ../../docs/api/python xiaoyi || echo "pdoc failed, skipping"
-
       - name: Copy docs to deployment directory
         run: |
           mkdir -p _site
           cp -r src/rust/target/doc/* _site/
-          if [ -d "docs/api/python" ]; then
-            cp -r docs/api/python _site/python
-          fi
-          if [ -d "src/typescript/docs" ]; then
-            cp -r src/typescript/docs _site/typescript
-          fi
 
       - name: Add custom index.html
         run: |
@@ -83,8 +66,6 @@ jobs:
               .card a { text-decoration: none; color: inherit; }
               .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.875rem; font-weight: 600; }
               .badge-rust { background: #fef3c7; color: #92400e; }
-              .badge-ts { background: #dbeafe; color: #1e40af; }
-              .badge-py { background: #dcfce7; color: #166534; }
             </style>
           </head>
           <body>
@@ -95,16 +76,6 @@ jobs:
                 <span class="badge badge-rust">Rust</span>
                 <h2>Rust Core API</h2>
                 <p>Core runtime, LLM clients, workflow engine, memory systems, and orchestration</p>
-              </a>
-              <a href="python/index.html" class="card">
-                <span class="badge badge-py">Python</span>
-                <h2>Python SDK</h2>
-                <p>AI/ML ecosystem integration with async support</p>
-              </a>
-              <a href="typescript/index.html" class="card">
-                <span class="badge badge-ts">TypeScript</span>
-                <h2>TypeScript SDK</h2>
-                <p>Web/Edge runtime with full type safety</p>
               </a>
             </div>
             <hr style="margin: 3rem 0;">

@@ -16,33 +16,34 @@
 //! @group Core Runtime
 //! @since 0.1.0
 //! @author Miruamel
-//! @see crate::core::config::source
-//! @see crate::core::error
-//!
-//! # Example
-//!
-//! ```no_run
-//! use xiaoyi::core::config::{Config, source::FileSource};
-//!
-//! let config = Config::builder()
-//!     .add_source(FileSource::new("./config.toml"))
-//!     .build()?;
-//! let port: u16 = config.get("server.port")?;
-//! ```
-//!
-//! # Configuration Sources
-//!
-//! Sources are evaluated in order; later sources override earlier ones.
-//!
-//! 1. **Defaults** — Built-in defaults for each setting.
-//! 2. **File** — TOML, JSON, YAML files (layer 3).
-//! 3. **Environment** — `XIAOYI_` prefixed env vars (layer 3).
-//! 4. **Vault** — Encrypted secrets with AES-GCM (layer 3).
-//!
-//! @security
-//!   - Vault sources encrypt secrets at rest with AES-256-GCM.
-//!   - Keys derived from `XIAOYI_VAULT_KEY` env var (32 bytes).
-//!   - Never log vault contents; metadata only.
+/// @see crate::core::config::source
+/// @see crate::core::error
+///
+/// # Example
+///
+/// ```no_run
+/// use xiaoyi::core::config::{Config, ConfigBuilder};
+/// use xiaoyi::core::config::source::file::FileSource;
+///
+/// let config = Config::builder()
+///     .add_source(FileSource::new("./config.toml"))
+///     .build()?;
+/// let port: u16 = config.get("server.port")?;
+/// ```
+///
+/// # Configuration Sources
+///
+/// Sources are evaluated in order; later sources override earlier ones.
+///
+/// 1. **Defaults** — Built-in defaults for each setting.
+/// 2. **File** — TOML, JSON, YAML files (layer 3).
+/// 3. **Environment** — `XIAOYI_` prefixed env vars (layer 3).
+/// 4. **Vault** — Encrypted secrets with AES-GCM (layer 3).
+///
+/// @security
+///   - Vault sources encrypt secrets at rest with AES-256-GCM.
+///   - Keys derived from `XIAOYI_VAULT_KEY` env var (32 bytes).
+///   - Never log vault contents; metadata only.
 pub mod source;
 
 use crate::xiaoyi::core::error::{ErrorKind, Result, XiaoyiError};

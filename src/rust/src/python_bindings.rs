@@ -68,11 +68,11 @@ fn json_value_to_pyobject<'py>(
 /// @group Core Runtime
 /// @since 0.1.0
 ///
-/// Maps to [`xiaoyi::core::error::ErrorKind`].
+/// Maps to [`crate::xiaoyi::core::error::ErrorKind`].
 ///
 /// @see PyXiaoyiError
-/// @see xiaoyi::core::error::ErrorKind
-#[pyclass(eq, eq_int)]
+/// @see crate::xiaoyi::core::error::ErrorKind
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, Clone, PartialEq)]
 pub enum PyErrorKind {
     /// Syntax error during parsing or compilation.
@@ -173,10 +173,10 @@ impl From<PyErrorKind> for crate::xiaoyi::core::error::ErrorKind {
 /// @group Core Runtime
 /// @since 0.1.0
 ///
-/// Wraps [`xiaoyi::core::error::XiaoyiError`] for Python consumption.
+/// Wraps [`crate::xiaoyi::core::error::XiaoyiError`] for Python consumption.
 ///
-/// @see ErrorKind
-#[pyclass]
+/// @see crate::xiaoyi::core::error::ErrorKind
+#[pyclass(from_py_object)]
 #[derive(Debug, Clone)]
 pub struct PyXiaoyiError {
     /// @brief Wrapped Rust error.
@@ -286,10 +286,10 @@ pub fn is_xiaoyi_error(error: &Bound<'_, PyAny>) -> PyResult<bool> {
 /// @group Core Runtime
 /// @since 0.1.0
 ///
-/// Maps to [`xiaoyi::core::result::Status`].
+/// Maps to [`crate::xiaoyi::core::result::Status`].
 ///
-/// @see xiaoyi::core::result::Status
-#[pyclass(eq, eq_int)]
+/// @see crate::xiaoyi::core::result::Status
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum PyStatus {
     /// @brief Operation completed successfully.
@@ -395,11 +395,11 @@ impl From<crate::xiaoyi::core::result::Status> for PyStatus {
 /// @group Core Runtime
 /// @since 0.1.0
 ///
-/// Wraps [`xiaoyi::core::config::Config`].
+/// Wraps [`crate::xiaoyi::core::config::Config`].
 ///
-/// @see ConfigBuilder
-/// @see xiaoyi::core::config::Config
-#[pyclass]
+/// @see crate::xiaoyi::core::config::ConfigBuilder
+/// @see crate::xiaoyi::core::config::Config
+#[pyclass(from_py_object)]
 #[derive(Debug, Clone)]
 pub struct PyConfig {
     pub(crate) inner: crate::xiaoyi::core::config::Config,
@@ -491,11 +491,11 @@ impl Default for PyConfig {
 /// @group Core Runtime
 /// @since 0.1.0
 ///
-/// Wraps [`xiaoyi::core::config::ConfigBuilder`].
+/// Wraps [`crate::xiaoyi::core::config::ConfigBuilder`].
 ///
-/// @see Config
-/// @see xiaoyi::core::config::ConfigBuilder
-#[pyclass]
+/// @see crate::xiaoyi::core::config::Config
+/// @see crate::xiaoyi::core::config::ConfigBuilder
+#[pyclass(from_py_object)]
 #[derive(Debug, Clone)]
 pub struct PyConfigBuilder {
     pub(crate) inner: crate::xiaoyi::core::config::ConfigBuilder,
@@ -544,7 +544,7 @@ impl Default for PyConfigBuilder {
 /// @enum
 /// @group Core Runtime
 /// @since 0.1.0
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PySourceCapability {
     /// @brief Read capability.
@@ -617,7 +617,7 @@ impl PyConfigSource {
 /// source = FileSource("./config.toml")
 /// config = source.load()
 /// ```
-#[pyclass]
+#[pyclass(from_py_object)]
 #[derive(Debug, Clone)]
 pub struct PyFileSource {
     pub(crate) path: String,
@@ -689,7 +689,7 @@ impl PyFileSource {
 /// export XIAOYI_SERVER__PORT=3000
 /// export XIAOYI_DATABASE__URL=postgres://...
 /// ```
-#[pyclass]
+#[pyclass(from_py_object)]
 #[derive(Debug, Clone)]
 pub struct PyEnvSource {
     pub(crate) prefix: String,
@@ -760,7 +760,7 @@ impl Default for PyEnvSource {
 ///
 /// @see FileSource
 /// @see EnvSource
-#[pyclass]
+#[pyclass(from_py_object)]
 #[derive(Debug, Clone)]
 pub struct PyVaultSource {
     pub(crate) path: String,
@@ -860,7 +860,7 @@ pub fn decrypt_vault(ciphertext: Vec<u8>, key: Vec<u8>) -> PyResult<Vec<u8>> {
 /// @since 0.1.0
 ///
 /// @see xiaoyi::domain::token::primitive::PrimitiveKind
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PyPrimitiveKind {
     /// @brief Signed or unsigned integer.
@@ -889,7 +889,7 @@ impl PyPrimitiveKind {
 /// @enum
 /// @group Domain
 /// @since 0.1.0
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PyIntKind {
     /// @brief Signed integer.
@@ -918,7 +918,7 @@ impl PyIntKind {
 /// @enum
 /// @group Domain
 /// @since 0.1.0
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PyIntWidth {
     /// @brief 8-bit width.
@@ -963,7 +963,7 @@ impl PyIntWidth {
 /// @enum
 /// @group Domain
 /// @since 0.1.0
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PyFloatKind {
     /// @brief 32-bit float.
@@ -1007,7 +1007,7 @@ impl PyFloatKind {
 /// @since 0.1.0
 ///
 /// @see xiaoyi::domain::token::syntax::SyntaxKind
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PySyntaxKind {
     /// @brief Keyword token.
@@ -1051,7 +1051,7 @@ impl PySyntaxKind {
 ///
 /// @see PyOperator
 /// @see xiaoyi::domain::token::syntax::operator::OperatorKind
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PyOperatorKind {
     /// @brief Arithmetic (+, -, *, /, %).
@@ -1095,7 +1095,7 @@ impl PyOperatorKind {
 /// @enum
 /// @group Domain
 /// @since 0.1.0
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PyAssociativity {
     /// @brief Left associative (a + b + c = (a + b) + c).
@@ -1125,7 +1125,7 @@ impl PyAssociativity {
 /// @see PyOperatorKind
 /// @see PyAssociativity
 /// @see xiaoyi::domain::token::syntax::operator::Operator
-#[pyclass]
+#[pyclass(from_py_object)]
 #[derive(Debug, Clone)]
 pub struct PyOperator {
     pub(crate) inner: crate::xiaoyi::domain::token::syntax::operator::Operator,
@@ -1226,7 +1226,7 @@ pub fn all_operators() -> Vec<PyOperator> {
 /// @return Parsed value or None for empty string.
 /// @since 0.1.0
 #[pyfunction]
-pub fn parse_literal<'py>(raw: &str, _kind: PySyntaxKind, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+pub fn parse_literal<'py>(_raw: &str, _kind: PySyntaxKind, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
     // Use Python's own parsing for primitives - Rust core may not expose parse_literal
     Ok(py.None().into_bound(py).into_any())
 }
@@ -1243,7 +1243,7 @@ pub fn parse_literal<'py>(raw: &str, _kind: PySyntaxKind, py: Python<'py>) -> Py
 /// @see PyDagNode
 /// @see PyDagGraph
 /// @see xiaoyi::workflow::dag::graph::NodeId
-#[pyclass]
+#[pyclass(from_py_object)]
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub struct PyNodeId {
     pub(crate) inner: crate::xiaoyi::workflow::dag::graph::NodeId,
@@ -1290,7 +1290,7 @@ impl PyNodeId {
 /// @enum
 /// @group Orchestration
 /// @since 0.1.0
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PyNodeKind {
     /// @brief Task node.
@@ -1319,7 +1319,7 @@ impl PyNodeKind {
 /// @enum
 /// @group Orchestration
 /// @since 0.1.0
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PyEdgeKind {
     /// @brief Sequential dependency.
@@ -1349,7 +1349,7 @@ impl PyEdgeKind {
 /// @see PyNodeId
 /// @see PyDagGraph
 /// @see xiaoyi::workflow::dag::graph::DagNode
-#[pyclass]
+#[pyclass(from_py_object)]
 #[derive(Debug, Clone)]
 pub struct PyDagNode {
     pub(crate) inner: crate::xiaoyi::workflow::dag::graph::DagNode,
@@ -1401,7 +1401,7 @@ impl PyDagNode {
 /// @see PyDagNode
 /// @see PyDagGraph
 /// @see xiaoyi::workflow::dag::graph::DagEdge
-#[pyclass]
+#[pyclass(from_py_object)]
 #[derive(Debug, Clone)]
 pub struct PyDagEdge {
     pub(crate) inner: crate::xiaoyi::workflow::dag::graph::DagEdge,
@@ -1494,7 +1494,7 @@ impl PyDagGraph {
 ///
 /// @see PyLruCache
 /// @see xiaoyi::memory::stm::cache::CacheEntry
-#[pyclass]
+#[pyclass(from_py_object)]
 #[derive(Debug, Clone)]
 pub struct PyCacheEntry {
     pub(crate) inner: crate::xiaoyi::memory::stm::cache::CacheEntry<String>,
@@ -1528,7 +1528,7 @@ impl PyCacheEntry {
 ///
 /// @see PyLruCache
 /// @see xiaoyi::memory::stm::cache::CacheStats
-#[pyclass]
+#[pyclass(from_py_object)]
 #[derive(Debug, Clone, Default)]
 pub struct PyCacheStats {
     pub(crate) inner: crate::xiaoyi::memory::stm::cache::CacheStats,
@@ -1601,7 +1601,8 @@ impl PyCacheStats {
 /// cache.insert("key", "value")
 /// value = cache.get("key")  # "value"
 /// ```
-#[pyclass]
+#[pyclass(from_py_object)]
+#[derive(Clone)]
 pub struct PyLruCache {
     pub(crate) inner: std::sync::Arc<tokio::sync::RwLock<crate::xiaoyi::memory::stm::cache::LruCache<String, String>>>,
 }

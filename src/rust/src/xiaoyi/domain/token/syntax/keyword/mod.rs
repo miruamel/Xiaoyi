@@ -17,7 +17,7 @@
 //! @see crate::domain::token::syntax
 //! @see crate::domain::token::syntax::operator
 
-use crate::xiaoyi::domain::token::syntax::SyntaxKind;
+
 
 /// Keyword token.
 ///

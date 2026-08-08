@@ -17,16 +17,18 @@
 //! @see crate::orchestrator
 //! @see crate::gateway
 //!
-//! # Example
-//!
-//! ```rust
-//! use xiaoyi::builder::AgentBuilder;
-//!
-//! let agent = AgentBuilder::new()
-//!     .name("assistant")
-//!     .model("gpt-4")
-//!     .build()?;
-//! ```
+/// # Example
+///
+/// ```rust
+/// use xiaoyi::builder::AgentBuilder;
+/// use xiaoyi::core::config::Config;
+///
+/// let config = Config::default();
+/// let agent = AgentBuilder::new(config)
+///     .name("assistant")
+///     .model("gpt-4")
+///     .build()?;
+/// ```
 pub mod ast;
 pub mod codegen;
 pub mod template;

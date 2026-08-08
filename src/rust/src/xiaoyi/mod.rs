@@ -32,9 +32,9 @@
 //! @see crate::builder
 //! @see crate::orchestrator
 //! @see crate::gateway
-//! @module xiaoyi
 pub mod builder;
 pub mod core;
+pub mod critic;
 pub mod domain;
 pub mod gateway;
 pub mod lexer;
@@ -42,3 +42,8 @@ pub mod llm;
 pub mod memory;
 pub mod orchestrator;
 pub mod workflow;
+
+// Re-exports for public API
+pub use core::config::{Config, ConfigBuilder};
+pub use core::error::{ErrorKind, XiaoyiError, Result};
+pub use core::result::Status;
