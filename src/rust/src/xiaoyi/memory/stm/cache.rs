@@ -51,6 +51,20 @@ pub struct CacheEntry<V> {
     pub expiry: Option<Instant>,
 }
 
+impl<V> CacheEntry<V> {
+    /// Check if the entry has expired.
+    ///
+    /// @return True if expired
+    /// @since 0.1.0
+    pub fn is_expired(&self) -> bool {
+        if let Some(expiry) = self.expiry {
+            Instant::now() > expiry
+        } else {
+            false
+        }
+    }
+}
+
 /// Cache statistics.
 ///
 /// @brief Cache performance metrics
@@ -68,6 +82,21 @@ pub struct CacheStats {
     pub size: usize,
     /// Maximum cache capacity.
     pub capacity: usize,
+}
+
+impl CacheStats {
+    /// Calculate the cache hit rate.
+    ///
+    /// @return Hit rate as a float (0.0 to 1.0)
+    /// @since 0.1.0
+    pub fn hit_rate(&self) -> f64 {
+        let total = self.hits + self.misses;
+        if total == 0 {
+            0.0
+        } else {
+            self.hits as f64 / total as f64
+        }
+    }
 }
 
 /// LRU cache with optional TTL.
@@ -221,7 +250,8 @@ where
         let mut order = self.order.write().unwrap();
         let now = Instant::now();
 
-        let expired_keys: Vec<K> = map.iter()
+        let expired_keys: Vec<K> = map
+            .iter()
             .filter(|(_, entry)| entry.expiry.map_or(false, |exp| now > exp))
             .map(|(k, _)| k.clone())
             .collect();
@@ -252,8 +282,8 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::time::Duration;
     use std::thread::sleep;
+    use std::time::Duration;
 
     #[test]
     fn test_basic_lru() {
@@ -279,7 +309,11 @@ mod tests {
     #[test]
     fn test_ttl_expiry() {
         let cache = LruCache::new(10);
-        cache.insert("key".to_string(), "value".to_string(), Some(Duration::from_millis(50)));
+        cache.insert(
+            "key".to_string(),
+            "value".to_string(),
+            Some(Duration::from_millis(50)),
+        );
         assert_eq!(cache.get(&"key".to_string()), Some("value".to_string()));
 
         sleep(Duration::from_millis(100));

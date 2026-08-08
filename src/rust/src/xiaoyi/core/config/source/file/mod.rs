@@ -45,8 +45,8 @@
 
 use crate::xiaoyi::core::config::source::ConfigSource;
 use crate::xiaoyi::core::error::{ErrorKind, Result, XiaoyiError};
-use async_trait::async_trait;
 use std::collections::HashMap;
+use std::fmt::Debug;
 use std::path::Path;
 
 /// File-based configuration source.
@@ -82,11 +82,19 @@ impl FileSource {
         self
     }
 }
-fn flatten_json(value: &serde_json::Value, prefix: &str, out: &mut HashMap<String, serde_json::Value>) {
+fn flatten_json(
+    value: &serde_json::Value,
+    prefix: &str,
+    out: &mut HashMap<String, serde_json::Value>,
+) {
     match value {
         serde_json::Value::Object(map) => {
             for (k, v) in map {
-                let new_prefix = if prefix.is_empty() { k.clone() } else { format!("{}.{}", prefix, k) };
+                let new_prefix = if prefix.is_empty() {
+                    k.clone()
+                } else {
+                    format!("{}.{}", prefix, k)
+                };
                 flatten_json(v, &new_prefix, out);
             }
         }
@@ -96,38 +104,58 @@ fn flatten_json(value: &serde_json::Value, prefix: &str, out: &mut HashMap<Strin
     }
 }
 
-#[async_trait]
 impl ConfigSource for FileSource {
-    async fn load(&self) -> Result<HashMap<String, serde_json::Value>> {
-        let path = Path::new(&self.path);
-        if !path.exists() {
-            if self.required {
-                return Err(XiaoyiError::new(
-                    ErrorKind::Config,
-                    "config file not found",
-                ).with_meta("path", &self.path));
+    fn load(&self) -> Result<HashMap<String, serde_json::Value>> {
+        let rt = tokio::runtime::Runtime::new().map_err(|e| {
+            XiaoyiError::new(ErrorKind::Config, "failed to create runtime")
+                .with_meta("error", &e.to_string())
+        })?;
+        rt.block_on(async {
+            let path = Path::new(&self.path);
+            if !path.exists() {
+                if self.required {
+                    return Err(XiaoyiError::new(ErrorKind::Config, "config file not found")
+                        .with_meta("path", &self.path));
+                }
+                return Ok(HashMap::new());
             }
-            return Ok(HashMap::new());
-        }
 
-        let content = tokio::fs::read_to_string(path).await
-            .map_err(|e| XiaoyiError::new(ErrorKind::Config, "failed to read config file")
-                .with_meta("path", &self.path)
-                .with_meta("error", &e.to_string()))?;
-        let ext = path.extension().and_then(|s| s.to_str()).unwrap_or("");
-        let value: serde_json::Value = match ext {
-            "toml" => toml::from_str(&content).map_err(|e| XiaoyiError::new(ErrorKind::Config, "failed to parse TOML").with_meta("error", &e.to_string()))?,
-            "json" => serde_json::from_str(&content).map_err(|e| XiaoyiError::new(ErrorKind::Config, "failed to parse JSON").with_meta("error", &e.to_string()))?,
-            "yaml" | "yml" => serde_yaml::from_str(&content).map_err(|e| XiaoyiError::new(ErrorKind::Config, "failed to parse YAML").with_meta("error", &e.to_string()))?,
-            _ => return Err(XiaoyiError::new(
-                ErrorKind::Config,
-                "unsupported config file format",
-            ).with_meta("path", &self.path).with_meta("extension", ext)),
-        };
+            let content = tokio::fs::read_to_string(path).await.map_err(|e| {
+                XiaoyiError::new(ErrorKind::Config, "failed to read config file")
+                    .with_meta("path", &self.path)
+                    .with_meta("error", &e.to_string())
+            })?;
+            let ext = path.extension().and_then(|s| s.to_str()).unwrap_or("");
+            let value: serde_json::Value = match ext {
+                "toml" => toml::from_str(&content).map_err(|e| {
+                    XiaoyiError::new(ErrorKind::Config, "failed to parse TOML")
+                        .with_meta("error", &e.to_string())
+                })?,
+                "json" => serde_json::from_str(&content).map_err(|e| {
+                    XiaoyiError::new(ErrorKind::Config, "failed to parse JSON")
+                        .with_meta("error", &e.to_string())
+                })?,
+                "yaml" | "yml" => serde_yaml::from_str(&content).map_err(|e| {
+                    XiaoyiError::new(ErrorKind::Config, "failed to parse YAML")
+                        .with_meta("error", &e.to_string())
+                })?,
+                _ => {
+                    return Err(
+                        XiaoyiError::new(ErrorKind::Config, "unsupported config file format")
+                            .with_meta("path", &self.path)
+                            .with_meta("extension", ext),
+                    );
+                }
+            };
 
-        let mut flat = HashMap::new();
-        flatten_json(&value, "", &mut flat);
-        Ok(flat)
+            let mut flat = HashMap::new();
+            flatten_json(&value, "", &mut flat);
+            Ok(flat)
+        })
+    }
+
+    fn clone_box(&self) -> Box<dyn ConfigSource> {
+        Box::new(self.clone())
     }
 }
 
@@ -147,7 +175,9 @@ pub mod norm {
         for component in path.components() {
             match component {
                 std::path::Component::ParentDir => {
-                    if !components.is_empty() && !matches!(components.last(), Some(std::path::Component::ParentDir)) {
+                    if !components.is_empty()
+                        && !matches!(components.last(), Some(std::path::Component::ParentDir))
+                    {
                         components.pop();
                     } else {
                         components.push(component);

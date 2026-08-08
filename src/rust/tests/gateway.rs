@@ -11,7 +11,7 @@
 
 use pretty_assertions::assert_eq;
 use tokio_test::block_on;
-use xiaoyi::{Gateway, Config};
+use xiaoyi::{Config, Gateway};
 
 #[test]
 fn test_gateway_new() {

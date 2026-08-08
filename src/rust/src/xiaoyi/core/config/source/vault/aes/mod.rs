@@ -22,5 +22,5 @@
 //!
 //! This module re-exports AES-GCM types for convenience.
 //! Direct use is discouraged; prefer `encrypt`/`decrypt` modules.
-pub use aes_gcm::{Aes256Gcm, Key, Nonce};
 pub use aes_gcm::aead::{Aead, KeyInit};
+pub use aes_gcm::{Aes256Gcm, Key, Nonce};

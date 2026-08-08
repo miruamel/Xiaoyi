@@ -31,7 +31,7 @@
 //! ```
 pub mod status;
 
-use crate::xiaoyi::core::error::{XiaoyiError, ErrorKind};
+use crate::xiaoyi::core::error::{ErrorKind, XiaoyiError};
 
 /// Standard Result type for Xiaoyi operations.
 ///

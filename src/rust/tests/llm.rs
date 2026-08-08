@@ -10,8 +10,8 @@
 //! @see crate::llm::client
 
 use pretty_assertions::assert_eq;
-use xiaoyi::{MessageRole, ChatMessage, ChatRequest, ChatResponse, Usage};
 use xiaoyi::xiaoyi::llm::client::{ChatChoice, LlmClient};
+use xiaoyi::{ChatMessage, ChatRequest, ChatResponse, MessageRole, Usage};
 
 #[test]
 fn test_message_role_variants() {

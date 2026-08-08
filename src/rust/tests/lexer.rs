@@ -12,9 +12,9 @@
 use pretty_assertions::assert_eq;
 
 // Integration test: import from the xiaoyi crate (matching builder.rs pattern)
+use xiaoyi::SyntaxKind;
 use xiaoyi::lexer::scanner::Scanner;
 use xiaoyi::lexer::token::Token;
-use xiaoyi::SyntaxKind;
 #[test]
 fn test_scanner_new() {
     let _scanner = Scanner::new("test input");

@@ -17,7 +17,7 @@
 //! @see crate::domain::token::syntax
 //! @see crate::domain::token::syntax::keyword
 
-use crate::xiaoyi::domain::token::syntax::SyntaxKind;
+
 
 /// Operator token.
 ///
@@ -81,50 +81,210 @@ pub enum Associativity {
 /// @since 0.1.0
 pub const OPERATORS: &[Operator] = &[
     // Member access / call / index (highest precedence)
-    Operator { symbol: ".", kind: OperatorKind::MemberAccess, precedence: 15, associativity: Associativity::Left },
-    Operator { symbol: "..", kind: OperatorKind::MemberAccess, precedence: 15, associativity: Associativity::Left },
-    Operator { symbol: "?.", kind: OperatorKind::MemberAccess, precedence: 15, associativity: Associativity::Left },
-    Operator { symbol: "()", kind: OperatorKind::CallIndex, precedence: 15, associativity: Associativity::Left },
-    Operator { symbol: "[]", kind: OperatorKind::CallIndex, precedence: 15, associativity: Associativity::Left },
+    Operator {
+        symbol: ".",
+        kind: OperatorKind::MemberAccess,
+        precedence: 15,
+        associativity: Associativity::Left,
+    },
+    Operator {
+        symbol: "..",
+        kind: OperatorKind::MemberAccess,
+        precedence: 15,
+        associativity: Associativity::Left,
+    },
+    Operator {
+        symbol: "?.",
+        kind: OperatorKind::MemberAccess,
+        precedence: 15,
+        associativity: Associativity::Left,
+    },
+    Operator {
+        symbol: "()",
+        kind: OperatorKind::CallIndex,
+        precedence: 15,
+        associativity: Associativity::Left,
+    },
+    Operator {
+        symbol: "[]",
+        kind: OperatorKind::CallIndex,
+        precedence: 15,
+        associativity: Associativity::Left,
+    },
     // Unary
-    Operator { symbol: "-", kind: OperatorKind::Arithmetic, precedence: 14, associativity: Associativity::Right },
-    Operator { symbol: "!", kind: OperatorKind::Logical, precedence: 14, associativity: Associativity::Right },
-    Operator { symbol: "~", kind: OperatorKind::Bitwise, precedence: 14, associativity: Associativity::Right },
+    Operator {
+        symbol: "-",
+        kind: OperatorKind::Arithmetic,
+        precedence: 14,
+        associativity: Associativity::Right,
+    },
+    Operator {
+        symbol: "!",
+        kind: OperatorKind::Logical,
+        precedence: 14,
+        associativity: Associativity::Right,
+    },
+    Operator {
+        symbol: "~",
+        kind: OperatorKind::Bitwise,
+        precedence: 14,
+        associativity: Associativity::Right,
+    },
     // Multiplicative
-    Operator { symbol: "*", kind: OperatorKind::Arithmetic, precedence: 13, associativity: Associativity::Left },
-    Operator { symbol: "/", kind: OperatorKind::Arithmetic, precedence: 13, associativity: Associativity::Left },
-    Operator { symbol: "%", kind: OperatorKind::Arithmetic, precedence: 13, associativity: Associativity::Left },
+    Operator {
+        symbol: "*",
+        kind: OperatorKind::Arithmetic,
+        precedence: 13,
+        associativity: Associativity::Left,
+    },
+    Operator {
+        symbol: "/",
+        kind: OperatorKind::Arithmetic,
+        precedence: 13,
+        associativity: Associativity::Left,
+    },
+    Operator {
+        symbol: "%",
+        kind: OperatorKind::Arithmetic,
+        precedence: 13,
+        associativity: Associativity::Left,
+    },
     // Additive
-    Operator { symbol: "+", kind: OperatorKind::Arithmetic, precedence: 12, associativity: Associativity::Left },
-    Operator { symbol: "-", kind: OperatorKind::Arithmetic, precedence: 12, associativity: Associativity::Left },
+    Operator {
+        symbol: "+",
+        kind: OperatorKind::Arithmetic,
+        precedence: 12,
+        associativity: Associativity::Left,
+    },
+    Operator {
+        symbol: "-",
+        kind: OperatorKind::Arithmetic,
+        precedence: 12,
+        associativity: Associativity::Left,
+    },
     // Shift
-    Operator { symbol: "<<", kind: OperatorKind::Bitwise, precedence: 11, associativity: Associativity::Left },
-    Operator { symbol: ">>", kind: OperatorKind::Bitwise, precedence: 11, associativity: Associativity::Left },
+    Operator {
+        symbol: "<<",
+        kind: OperatorKind::Bitwise,
+        precedence: 11,
+        associativity: Associativity::Left,
+    },
+    Operator {
+        symbol: ">>",
+        kind: OperatorKind::Bitwise,
+        precedence: 11,
+        associativity: Associativity::Left,
+    },
     // Comparison
-    Operator { symbol: "<", kind: OperatorKind::Comparison, precedence: 10, associativity: Associativity::None },
-    Operator { symbol: ">", kind: OperatorKind::Comparison, precedence: 10, associativity: Associativity::None },
-    Operator { symbol: "<=", kind: OperatorKind::Comparison, precedence: 10, associativity: Associativity::None },
-    Operator { symbol: ">=", kind: OperatorKind::Comparison, precedence: 10, associativity: Associativity::None },
+    Operator {
+        symbol: "<",
+        kind: OperatorKind::Comparison,
+        precedence: 10,
+        associativity: Associativity::None,
+    },
+    Operator {
+        symbol: ">",
+        kind: OperatorKind::Comparison,
+        precedence: 10,
+        associativity: Associativity::None,
+    },
+    Operator {
+        symbol: "<=",
+        kind: OperatorKind::Comparison,
+        precedence: 10,
+        associativity: Associativity::None,
+    },
+    Operator {
+        symbol: ">=",
+        kind: OperatorKind::Comparison,
+        precedence: 10,
+        associativity: Associativity::None,
+    },
     // Equality
-    Operator { symbol: "==", kind: OperatorKind::Comparison, precedence: 9, associativity: Associativity::Left },
-    Operator { symbol: "!=", kind: OperatorKind::Comparison, precedence: 9, associativity: Associativity::Left },
+    Operator {
+        symbol: "==",
+        kind: OperatorKind::Comparison,
+        precedence: 9,
+        associativity: Associativity::Left,
+    },
+    Operator {
+        symbol: "!=",
+        kind: OperatorKind::Comparison,
+        precedence: 9,
+        associativity: Associativity::Left,
+    },
     // Bitwise AND
-    Operator { symbol: "&", kind: OperatorKind::Bitwise, precedence: 8, associativity: Associativity::Left },
+    Operator {
+        symbol: "&",
+        kind: OperatorKind::Bitwise,
+        precedence: 8,
+        associativity: Associativity::Left,
+    },
     // Bitwise XOR
-    Operator { symbol: "^", kind: OperatorKind::Bitwise, precedence: 7, associativity: Associativity::Left },
+    Operator {
+        symbol: "^",
+        kind: OperatorKind::Bitwise,
+        precedence: 7,
+        associativity: Associativity::Left,
+    },
     // Bitwise OR
-    Operator { symbol: "|", kind: OperatorKind::Bitwise, precedence: 6, associativity: Associativity::Left },
+    Operator {
+        symbol: "|",
+        kind: OperatorKind::Bitwise,
+        precedence: 6,
+        associativity: Associativity::Left,
+    },
     // Logical AND
-    Operator { symbol: "&&", kind: OperatorKind::Logical, precedence: 5, associativity: Associativity::Left },
+    Operator {
+        symbol: "&&",
+        kind: OperatorKind::Logical,
+        precedence: 5,
+        associativity: Associativity::Left,
+    },
     // Logical OR
-    Operator { symbol: "||", kind: OperatorKind::Logical, precedence: 4, associativity: Associativity::Left },
+    Operator {
+        symbol: "||",
+        kind: OperatorKind::Logical,
+        precedence: 4,
+        associativity: Associativity::Left,
+    },
     // Assignment (lowest, right-associative)
-    Operator { symbol: "=", kind: OperatorKind::Assignment, precedence: 3, associativity: Associativity::Right },
-    Operator { symbol: "+=", kind: OperatorKind::Assignment, precedence: 3, associativity: Associativity::Right },
-    Operator { symbol: "-=", kind: OperatorKind::Assignment, precedence: 3, associativity: Associativity::Right },
-    Operator { symbol: "*=", kind: OperatorKind::Assignment, precedence: 3, associativity: Associativity::Right },
-    Operator { symbol: "/=", kind: OperatorKind::Assignment, precedence: 3, associativity: Associativity::Right },
-    Operator { symbol: "%=", kind: OperatorKind::Assignment, precedence: 3, associativity: Associativity::Right },
+    Operator {
+        symbol: "=",
+        kind: OperatorKind::Assignment,
+        precedence: 3,
+        associativity: Associativity::Right,
+    },
+    Operator {
+        symbol: "+=",
+        kind: OperatorKind::Assignment,
+        precedence: 3,
+        associativity: Associativity::Right,
+    },
+    Operator {
+        symbol: "-=",
+        kind: OperatorKind::Assignment,
+        precedence: 3,
+        associativity: Associativity::Right,
+    },
+    Operator {
+        symbol: "*=",
+        kind: OperatorKind::Assignment,
+        precedence: 3,
+        associativity: Associativity::Right,
+    },
+    Operator {
+        symbol: "/=",
+        kind: OperatorKind::Assignment,
+        precedence: 3,
+        associativity: Associativity::Right,
+    },
+    Operator {
+        symbol: "%=",
+        kind: OperatorKind::Assignment,
+        precedence: 3,
+        associativity: Associativity::Right,
+    },
 ];
 
 /// Find operator by symbol.
@@ -142,5 +302,8 @@ pub fn from_symbol(sym: &str) -> Option<&'static Operator> {
 /// @return Matching operators
 /// @since 0.1.0
 pub fn with_prefix(prefix: &str) -> Vec<&'static Operator> {
-    OPERATORS.iter().filter(|op| op.symbol.starts_with(prefix)).collect()
+    OPERATORS
+        .iter()
+        .filter(|op| op.symbol.starts_with(prefix))
+        .collect()
 }

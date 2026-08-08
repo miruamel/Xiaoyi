@@ -17,21 +17,25 @@
 //! @see crate::builder
 //! @see crate::gateway
 //!
-//! # Example
-//!
-//! ```rust
-//! use xiaoyi::orchestrator::Orchestrator;
-//!
-//! let orchestrator = Orchestrator::new(config);
-//! orchestrator.run(agent).await?;
-//! ```
+/// # Example
+///
+/// ```rust
+/// use xiaoyi::orchestrator::Orchestrator;
+/// use xiaoyi::builder::AgentBuilder;
+/// use xiaoyi::core::config::Config;
+///
+/// let config = Config::default();
+/// let agent = AgentBuilder::new(config.clone()).name("test").model("test").build()?;
+/// let orchestrator = Orchestrator::new(config);
+/// orchestrator.run(agent).await?;
+/// ```
 pub mod loop_;
-pub mod policy;
 pub mod monitor;
+pub mod policy;
 
+use crate::xiaoyi::builder::AgentHandle;
 use crate::xiaoyi::core::config::Config;
 use crate::xiaoyi::core::result::Result;
-use crate::xiaoyi::builder::AgentHandle;
 
 /// Orchestrator for running agent loops.
 ///
@@ -58,7 +62,7 @@ impl Orchestrator {
     /// @param agent Agent to run
     /// @return Execution result
     /// @since 0.1.0
-    pub async fn run(&self, agent: AgentHandle) -> Result<()> {
+    pub async fn run(&self, _agent: AgentHandle) -> Result<()> {
         // Execute agent loop
         Ok(())
     }

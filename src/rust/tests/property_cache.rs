@@ -10,7 +10,7 @@
 //! @see crate::memory::stm::cache::LruCache
 
 use proptest::prelude::*;
-use xiaoyi::{LruCache, CacheStats};
+use xiaoyi::{CacheStats, LruCache};
 
 proptest! {
     #[test]
@@ -24,7 +24,7 @@ proptest! {
             .filter(|(k, _)| seen.insert(k.clone()))
             .map(|(k, v)| (k.clone(), v.clone()))
             .collect();
-        
+
         let cache = LruCache::new(1000);
         for (k, v) in &unique_pairs {
             cache.insert(k.clone(), v.clone(), None);
@@ -47,7 +47,7 @@ proptest! {
             .filter(|(k, _)| seen.insert(k.clone()))
             .map(|(k, v)| (k.clone(), v.clone()))
             .collect();
-        
+
         let cache = LruCache::new(capacity);
         for (k, v) in &unique_pairs {
             cache.insert(k.clone(), v.clone(), None);

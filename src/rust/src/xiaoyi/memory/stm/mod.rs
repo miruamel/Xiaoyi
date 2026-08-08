@@ -19,4 +19,4 @@
 pub mod cache;
 
 // Re-exports from cache
-pub use cache::{LruCache as StmCache, CacheEntry, CacheStats, LruCache};
+pub use cache::{CacheEntry, CacheStats, LruCache as StmCache, LruCache};

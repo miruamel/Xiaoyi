@@ -27,8 +27,8 @@
 //!   - GCM provides authenticated encryption.
 //!   - Never reuse nonce with same key.
 use crate::xiaoyi::core::error::{ErrorKind, Result, XiaoyiError};
-use aes_gcm::{Aes256Gcm, Key, Nonce};
 use aes_gcm::aead::{Aead, KeyInit, OsRng};
+use aes_gcm::{Aes256Gcm, Key, Nonce};
 use rand::RngCore;
 
 /// Encrypt plaintext with AES-256-GCM.
@@ -45,11 +45,12 @@ pub fn encrypt(plaintext: &[u8], key: &[u8; 32]) -> Result<Vec<u8>> {
     let mut nonce = [0u8; 12];
     OsRng.fill_bytes(&mut nonce);
 
-    let ciphertext = cipher.encrypt(Nonce::from_slice(&nonce), plaintext)
-        .map_err(|e| XiaoyiError::new(
-            ErrorKind::Config,
-            "encryption failed",
-        ).with_meta("error", &e.to_string()))?;
+    let ciphertext = cipher
+        .encrypt(Nonce::from_slice(&nonce), plaintext)
+        .map_err(|e| {
+            XiaoyiError::new(ErrorKind::Config, "encryption failed")
+                .with_meta("error", &e.to_string())
+        })?;
 
     let mut result = Vec::with_capacity(12 + ciphertext.len());
     result.extend_from_slice(&nonce);

@@ -13,7 +13,7 @@ use pretty_assertions::assert_eq;
 use std::sync::Arc;
 use std::thread;
 use std::time::{Duration, Instant};
-use xiaoyi::{LruCache, CacheEntry, CacheStats};
+use xiaoyi::{CacheEntry, CacheStats, LruCache};
 
 #[test]
 fn test_lru_cache_new() {
@@ -91,7 +91,11 @@ fn test_lru_cache_update_existing() {
 #[test]
 fn test_lru_cache_ttl_expiry() {
     let cache = LruCache::new(10);
-    cache.insert("key".to_string(), "value".to_string(), Some(Duration::from_millis(50)));
+    cache.insert(
+        "key".to_string(),
+        "value".to_string(),
+        Some(Duration::from_millis(50)),
+    );
 
     assert_eq!(cache.get(&"key".to_string()), Some("value".to_string()));
 
@@ -197,20 +201,32 @@ fn test_lru_cache_concurrent_read_write() {
 
 #[test]
 fn test_cache_entry() {
-    let entry = CacheEntry { value: "value".to_string(), expiry: Some(Instant::now() + Duration::from_secs(60)) };
+    let entry = CacheEntry {
+        value: "value".to_string(),
+        expiry: Some(Instant::now() + Duration::from_secs(60)),
+    };
     assert_eq!(entry.value, "value");
     assert!(entry.expiry.is_some());
 
-    let expired = CacheEntry { value: "value".to_string(), expiry: Some(Instant::now() - Duration::from_millis(10)) };
+    let expired = CacheEntry {
+        value: "value".to_string(),
+        expiry: Some(Instant::now() - Duration::from_millis(10)),
+    };
     assert!(expired.expiry.map_or(false, |e| e < Instant::now()));
 
-    let no_ttl = CacheEntry { value: "value".to_string(), expiry: None };
+    let no_ttl = CacheEntry {
+        value: "value".to_string(),
+        expiry: None,
+    };
     assert!(no_ttl.expiry.is_none());
 }
 
 #[test]
 fn test_cache_entry_debug() {
-    let entry = CacheEntry { value: "test".to_string(), expiry: None };
+    let entry = CacheEntry {
+        value: "test".to_string(),
+        expiry: None,
+    };
     let debug = format!("{:?}", entry);
     assert!(debug.contains("test"));
 }

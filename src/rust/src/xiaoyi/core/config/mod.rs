@@ -16,47 +16,57 @@
 //! @group Core Runtime
 //! @since 0.1.0
 //! @author Miruamel
-//! @see crate::core::config::source
-//! @see crate::core::error
-//!
-//! # Example
-//!
-//! ```no_run
-//! use xiaoyi::core::config::{Config, source::FileSource};
-//!
-//! let config = Config::builder()
-//!     .add_source(FileSource::new("./config.toml"))
-//!     .build()?;
-//! let port: u16 = config.get("server.port")?;
-//! ```
-//!
-//! # Configuration Sources
-//!
-//! Sources are evaluated in order; later sources override earlier ones.
-//!
-//! 1. **Defaults** — Built-in defaults for each setting.
-//! 2. **File** — TOML, JSON, YAML files (layer 3).
-//! 3. **Environment** — `XIAOYI_` prefixed env vars (layer 3).
-//! 4. **Vault** — Encrypted secrets with AES-GCM (layer 3).
-//!
-//! @security
-//!   - Vault sources encrypt secrets at rest with AES-256-GCM.
-//!   - Keys derived from `XIAOYI_VAULT_KEY` env var (32 bytes).
-//!   - Never log vault contents; metadata only.
+/// @see crate::core::config::source
+/// @see crate::core::error
+///
+/// # Example
+///
+/// ```no_run
+/// use xiaoyi::core::config::{Config, ConfigBuilder};
+/// use xiaoyi::core::config::source::file::FileSource;
+///
+/// let config = Config::builder()
+///     .add_source(FileSource::new("./config.toml"))
+///     .build()?;
+/// let port: u16 = config.get("server.port")?;
+/// ```
+///
+/// # Configuration Sources
+///
+/// Sources are evaluated in order; later sources override earlier ones.
+///
+/// 1. **Defaults** — Built-in defaults for each setting.
+/// 2. **File** — TOML, JSON, YAML files (layer 3).
+/// 3. **Environment** — `XIAOYI_` prefixed env vars (layer 3).
+/// 4. **Vault** — Encrypted secrets with AES-GCM (layer 3).
+///
+/// @security
+///   - Vault sources encrypt secrets at rest with AES-256-GCM.
+///   - Keys derived from `XIAOYI_VAULT_KEY` env var (32 bytes).
+///   - Never log vault contents; metadata only.
 pub mod source;
 
 use crate::xiaoyi::core::error::{ErrorKind, Result, XiaoyiError};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::fmt::Debug;
 
 /// Configuration builder for composing multiple sources.
 ///
 /// @brief Fluent builder for multi-source configuration
 /// @group Core Runtime
 /// @since 0.1.0
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct ConfigBuilder {
     sources: Vec<Box<dyn ConfigSource>>,
+}
+
+impl Clone for ConfigBuilder {
+    fn clone(&self) -> Self {
+        Self {
+            sources: self.sources.iter().map(|s| s.clone_box()).collect(),
+        }
+    }
 }
 
 impl ConfigBuilder {
@@ -101,13 +111,14 @@ impl ConfigBuilder {
 /// @see FileSource
 /// @see EnvSource
 /// @see VaultSource
-pub trait ConfigSource: Send + Sync {
+pub trait ConfigSource: Send + Sync + Debug {
     /// Load configuration from this source.
     ///
     /// @return Key-value map or error
     /// @throw Config error on load failure
     /// @since 0.1.0
     fn load(&self) -> Result<HashMap<String, serde_json::Value>>;
+    fn clone_box(&self) -> Box<dyn ConfigSource>;
 }
 
 /// Merged configuration from all sources.
@@ -139,14 +150,20 @@ impl Config {
         let mut current: &serde_json::Value = self
             .data
             .get(key.split('.').next().unwrap_or(""))
-            .ok_or_else(|| XiaoyiError::new(ErrorKind::Config, format!("config key not found: {}", key)))?;
+            .ok_or_else(|| {
+                XiaoyiError::new(ErrorKind::Config, format!("config key not found: {}", key))
+            })?;
         for part in key.split('.').skip(1) {
-            current = current
-                .get(part)
-                .ok_or_else(|| XiaoyiError::new(ErrorKind::Config, format!("config key not found: {}", key)))?;
+            current = current.get(part).ok_or_else(|| {
+                XiaoyiError::new(ErrorKind::Config, format!("config key not found: {}", key))
+            })?;
         }
-        serde_json::from_value(current.clone())
-            .map_err(|e| XiaoyiError::new(ErrorKind::Config, format!("type mismatch for {}: {}", key, e)))
+        serde_json::from_value(current.clone()).map_err(|e| {
+            XiaoyiError::new(
+                ErrorKind::Config,
+                format!("type mismatch for {}: {}", key, e),
+            )
+        })
     }
     /// Check if a key exists.
     ///
@@ -164,5 +181,44 @@ impl Config {
             }
         }
         !current.is_null()
+    }
+    /// Get all keys at the top level.
+    ///
+    /// @return Vector of key strings
+    /// @since 0.1.0
+    pub fn keys(&self) -> Vec<String> {
+        self.data.keys().cloned().collect()
+    }
+
+    /// Get the number of top-level entries.
+    ///
+    /// @return Count of entries
+    /// @since 0.1.0
+    pub fn len(&self) -> usize {
+        self.data.len()
+    }
+
+    /// Check if configuration is empty.
+    ///
+    /// @return true if no entries
+    /// @since 0.1.0
+    pub fn is_empty(&self) -> bool {
+        self.data.is_empty()
+    }
+
+    /// Iterate over all key-value pairs.
+    ///
+    /// @return Iterator over (key, value) pairs
+    /// @since 0.1.0
+    pub fn iter(&self) -> impl Iterator<Item = (&String, &serde_json::Value)> {
+        self.data.iter()
+    }
+
+    /// Get a reference to the underlying data map.
+    ///
+    /// @return Reference to the data HashMap
+    /// @since 0.1.0
+    pub fn data(&self) -> &HashMap<String, serde_json::Value> {
+        &self.data
     }
 }

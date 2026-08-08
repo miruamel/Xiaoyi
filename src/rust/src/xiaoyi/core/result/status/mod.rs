@@ -16,17 +16,20 @@
 //! @author Miruamel
 //! @see crate::core::result
 //!
-//! # Usage
-//!
-//! Use for structured logging, metrics, and retry decisions.
-//!
-//! ```rust
-//! use xiaoyi::core::result::status::StatusCode;
-//!
-//! match StatusCode::from_err(&err) {
-//!     StatusCode::Transient => retry(),
-//!     StatusCode::Permanent => alert(),
-//! }
+/// # Usage
+///
+/// Use for structured logging, metrics, and retry decisions.
+///
+/// ```rust
+/// use xiaoyi::core::result::status::{RetryClass, StatusCode};
+///
+/// let status = StatusCode::ResourceExhausted;
+/// match status.retry_class() {
+///     RetryClass::Transient => println!("retry"),
+///     RetryClass::Permanent => println!("alert"),
+///     RetryClass::Unknown => println!("unknown"),
+/// }
+/// ```
 /// Retryable vs permanent classification.
 ///
 /// @brief Error retryability classification
@@ -93,12 +96,22 @@ impl StatusCode {
     pub fn retry_class(&self) -> RetryClass {
         use RetryClass::*;
         match self {
-            StatusCode::Ok | StatusCode::Cancelled | StatusCode::InvalidArgument
-            | StatusCode::NotFound | StatusCode::AlreadyExists | StatusCode::PermissionDenied
-            | StatusCode::FailedPrecondition | StatusCode::OutOfRange | StatusCode::Unimplemented
-            | StatusCode::DataLoss | StatusCode::Unauthenticated => Permanent,
-            StatusCode::DeadlineExceeded | StatusCode::ResourceExhausted
-            | StatusCode::Aborted | StatusCode::Internal | StatusCode::Unavailable => Transient,
+            StatusCode::Ok
+            | StatusCode::Cancelled
+            | StatusCode::InvalidArgument
+            | StatusCode::NotFound
+            | StatusCode::AlreadyExists
+            | StatusCode::PermissionDenied
+            | StatusCode::FailedPrecondition
+            | StatusCode::OutOfRange
+            | StatusCode::Unimplemented
+            | StatusCode::DataLoss
+            | StatusCode::Unauthenticated => Permanent,
+            StatusCode::DeadlineExceeded
+            | StatusCode::ResourceExhausted
+            | StatusCode::Aborted
+            | StatusCode::Internal
+            | StatusCode::Unavailable => Transient,
             StatusCode::Unknown => Unknown,
         }
     }

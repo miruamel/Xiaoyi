@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-xiaoyi = { path = "../../../src/rust", features = ["full"] }
+xiaoyi = { path = "../../../src/rust", features = ["python"] }
 tokio = { version = "1", features = ["full"] }
 anyhow = "1.0"
 serde = { version = "1.0", features = ["derive"] }

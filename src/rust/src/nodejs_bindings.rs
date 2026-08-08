@@ -14,7 +14,6 @@
 //! @see https://github.com/napi-rs/napi-rs
 
 #[cfg(feature = "nodejs")]
-use napi::bindgen_prelude::*;
 use napi_derive::napi;
 
 /// Initialize the Node.js module.

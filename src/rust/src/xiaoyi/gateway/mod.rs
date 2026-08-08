@@ -17,14 +17,16 @@
 //! @see crate::builder
 //! @see crate::orchestrator
 //!
-//! # Example
-//!
-//! ```rust
-//! use xiaoyi::gateway::Gateway;
-//!
-//! let gateway = Gateway::new(config);
-//! gateway.start().await?;
-//! ```
+/// # Example
+///
+/// ```rust
+/// use xiaoyi::gateway::Gateway;
+/// use xiaoyi::core::config::Config;
+///
+/// let config = Config::default();
+/// let gateway = Gateway::new(config);
+/// gateway.start().await?;
+/// ```
 pub mod api;
 pub mod cli;
 pub mod web;

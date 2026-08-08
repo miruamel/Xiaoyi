@@ -33,16 +33,16 @@
 //!   - Rotate keys periodically via key derivation.
 //!   - Vault files should have restricted permissions (600).
 pub mod aes;
-pub mod key;
-pub mod encrypt;
 pub mod decrypt;
+pub mod encrypt;
+pub mod key;
 
 use crate::xiaoyi::core::config::source::ConfigSource;
-use crate::xiaoyi::core::error::{ErrorKind, Result, XiaoyiError};
-use crate::xiaoyi::core::config::source::vault::key::load_key;
 use crate::xiaoyi::core::config::source::vault::decrypt::decrypt as vault_decrypt;
-use async_trait::async_trait;
+use crate::xiaoyi::core::config::source::vault::key::load_key;
+use crate::xiaoyi::core::error::{ErrorKind, Result, XiaoyiError};
 use std::collections::HashMap;
+use std::fmt::Debug;
 use std::path::Path;
 
 /// Vault configuration source (encrypted file).
@@ -79,38 +79,49 @@ impl VaultSource {
     }
 }
 
-#[async_trait]
 impl ConfigSource for VaultSource {
-    async fn load(&self) -> Result<HashMap<String, serde_json::Value>> {
-        let path = Path::new(&self.path);
-        if !path.exists() {
-            if self.required {
-                return Err(XiaoyiError::new(
-                    ErrorKind::Config,
-                    "vault file not found",
-                ).with_meta("path", &self.path));
+    fn load(&self) -> Result<HashMap<String, serde_json::Value>> {
+        let rt = tokio::runtime::Runtime::new().map_err(|e| {
+            XiaoyiError::new(ErrorKind::Config, "failed to create runtime")
+                .with_meta("error", &e.to_string())
+        })?;
+        rt.block_on(async {
+            let path = Path::new(&self.path);
+            if !path.exists() {
+                if self.required {
+                    return Err(XiaoyiError::new(ErrorKind::Config, "vault file not found")
+                        .with_meta("path", &self.path));
+                }
+                return Ok(HashMap::new());
             }
-            return Ok(HashMap::new());
-        }
 
-        let encrypted = tokio::fs::read(path).await
-            .map_err(|e| XiaoyiError::new(ErrorKind::Config, "failed to read vault")
-                .with_meta("path", &self.path)
-                .with_meta("error", &e.to_string()))?;
+            let encrypted = tokio::fs::read(path).await.map_err(|e| {
+                XiaoyiError::new(ErrorKind::Config, "failed to read vault")
+                    .with_meta("path", &self.path)
+                    .with_meta("error", &e.to_string())
+            })?;
 
-        let key = load_key()?;
-        let decrypted = vault_decrypt(&encrypted, &key)
-            .map_err(|e| XiaoyiError::new(ErrorKind::Config, "vault decryption failed")
-                .with_meta("path", &self.path)
-                .with_meta("error", &e.to_string()))?;
+            let key = load_key()?;
+            let decrypted = vault_decrypt(&encrypted, &key).map_err(|e| {
+                XiaoyiError::new(ErrorKind::Config, "vault decryption failed")
+                    .with_meta("path", &self.path)
+                    .with_meta("error", &e.to_string())
+            })?;
 
-        let content = String::from_utf8(decrypted)
-            .map_err(|e| XiaoyiError::new(ErrorKind::Config, "vault content not valid UTF-8")
-                .with_meta("error", &e.to_string()))?;
+            let content = String::from_utf8(decrypted).map_err(|e| {
+                XiaoyiError::new(ErrorKind::Config, "vault content not valid UTF-8")
+                    .with_meta("error", &e.to_string())
+            })?;
 
-        toml::from_str(&content)
-            .map_err(|e| XiaoyiError::new(ErrorKind::Config, "vault content parse failed")
-                .with_meta("error", &e.to_string()))
+            toml::from_str(&content).map_err(|e| {
+                XiaoyiError::new(ErrorKind::Config, "vault content parse failed")
+                    .with_meta("error", &e.to_string())
+            })?
+        })
+    }
+
+    fn clone_box(&self) -> Box<dyn ConfigSource> {
+        Box::new(self.clone())
     }
 }
 

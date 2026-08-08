@@ -17,7 +17,7 @@
 //! @see crate::domain::token::syntax
 //! @see crate::domain::token::syntax::operator
 
-use crate::xiaoyi::domain::token::syntax::SyntaxKind;
+
 
 /// Keyword token.
 ///
@@ -59,31 +59,106 @@ pub enum KeywordKind {
 /// @group Domain
 /// @since 0.1.0
 pub const KEYWORDS: &[Keyword] = &[
-    Keyword { text: "if", kind: KeywordKind::ControlFlow },
-    Keyword { text: "else", kind: KeywordKind::ControlFlow },
-    Keyword { text: "while", kind: KeywordKind::ControlFlow },
-    Keyword { text: "for", kind: KeywordKind::ControlFlow },
-    Keyword { text: "return", kind: KeywordKind::ControlFlow },
-    Keyword { text: "break", kind: KeywordKind::ControlFlow },
-    Keyword { text: "continue", kind: KeywordKind::ControlFlow },
-    Keyword { text: "let", kind: KeywordKind::Declaration },
-    Keyword { text: "const", kind: KeywordKind::Declaration },
-    Keyword { text: "fn", kind: KeywordKind::Declaration },
-    Keyword { text: "struct", kind: KeywordKind::Declaration },
-    Keyword { text: "enum", kind: KeywordKind::Declaration },
-    Keyword { text: "int", kind: KeywordKind::Type },
-    Keyword { text: "float", kind: KeywordKind::Type },
-    Keyword { text: "bool", kind: KeywordKind::Type },
-    Keyword { text: "string", kind: KeywordKind::Type },
-    Keyword { text: "mod", kind: KeywordKind::Module },
-    Keyword { text: "use", kind: KeywordKind::Module },
-    Keyword { text: "pub", kind: KeywordKind::Module },
-    Keyword { text: "async", kind: KeywordKind::Async },
-    Keyword { text: "await", kind: KeywordKind::Async },
-    Keyword { text: "spawn", kind: KeywordKind::Async },
-    Keyword { text: "try", kind: KeywordKind::ErrorHandling },
-    Keyword { text: "catch", kind: KeywordKind::ErrorHandling },
-    Keyword { text: "throw", kind: KeywordKind::ErrorHandling },
+    Keyword {
+        text: "if",
+        kind: KeywordKind::ControlFlow,
+    },
+    Keyword {
+        text: "else",
+        kind: KeywordKind::ControlFlow,
+    },
+    Keyword {
+        text: "while",
+        kind: KeywordKind::ControlFlow,
+    },
+    Keyword {
+        text: "for",
+        kind: KeywordKind::ControlFlow,
+    },
+    Keyword {
+        text: "return",
+        kind: KeywordKind::ControlFlow,
+    },
+    Keyword {
+        text: "break",
+        kind: KeywordKind::ControlFlow,
+    },
+    Keyword {
+        text: "continue",
+        kind: KeywordKind::ControlFlow,
+    },
+    Keyword {
+        text: "let",
+        kind: KeywordKind::Declaration,
+    },
+    Keyword {
+        text: "const",
+        kind: KeywordKind::Declaration,
+    },
+    Keyword {
+        text: "fn",
+        kind: KeywordKind::Declaration,
+    },
+    Keyword {
+        text: "struct",
+        kind: KeywordKind::Declaration,
+    },
+    Keyword {
+        text: "enum",
+        kind: KeywordKind::Declaration,
+    },
+    Keyword {
+        text: "int",
+        kind: KeywordKind::Type,
+    },
+    Keyword {
+        text: "float",
+        kind: KeywordKind::Type,
+    },
+    Keyword {
+        text: "bool",
+        kind: KeywordKind::Type,
+    },
+    Keyword {
+        text: "string",
+        kind: KeywordKind::Type,
+    },
+    Keyword {
+        text: "mod",
+        kind: KeywordKind::Module,
+    },
+    Keyword {
+        text: "use",
+        kind: KeywordKind::Module,
+    },
+    Keyword {
+        text: "pub",
+        kind: KeywordKind::Module,
+    },
+    Keyword {
+        text: "async",
+        kind: KeywordKind::Async,
+    },
+    Keyword {
+        text: "await",
+        kind: KeywordKind::Async,
+    },
+    Keyword {
+        text: "spawn",
+        kind: KeywordKind::Async,
+    },
+    Keyword {
+        text: "try",
+        kind: KeywordKind::ErrorHandling,
+    },
+    Keyword {
+        text: "catch",
+        kind: KeywordKind::ErrorHandling,
+    },
+    Keyword {
+        text: "throw",
+        kind: KeywordKind::ErrorHandling,
+    },
 ];
 
 /// Check if identifier is a keyword.

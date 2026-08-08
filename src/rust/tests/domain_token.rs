@@ -10,7 +10,7 @@
 //! @see crate::domain::token
 
 use pretty_assertions::assert_eq;
-use xiaoyi::{PrimitiveKind, IntKind, IntWidth, IntType, FloatKind, SyntaxKind};
+use xiaoyi::{FloatKind, IntKind, IntType, IntWidth, PrimitiveKind, SyntaxKind};
 
 #[test]
 fn test_primitive_kind_variants() {
@@ -131,7 +131,7 @@ fn test_syntax_kind_debug() {
 #[test]
 fn test_token_reexports_work() {
     // Verify all re-exports from lib.rs work
-    use xiaoyi::{PrimitiveKind, IntKind, IntWidth, IntType, FloatKind, SyntaxKind};
+    use xiaoyi::{FloatKind, IntKind, IntType, IntWidth, PrimitiveKind, SyntaxKind};
     let _pk = PrimitiveKind::Int;
     let _ik = IntKind::Signed;
     let _iw = IntWidth::W32;

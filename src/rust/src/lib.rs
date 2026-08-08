@@ -16,7 +16,7 @@
 //! @group Xiaoyi
 //! @since 0.1.0
 //! @author Miruamel
-//! @see https://github.com/miruamel/Xiaoyi
+//! @see <https://github.com/miruamel/Xiaoyi>
 
 // Public modules
 pub mod xiaoyi;
@@ -29,34 +29,33 @@ mod python_bindings;
 #[cfg(feature = "nodejs")]
 mod nodejs_bindings;
 
-// Re-exports
-pub use xiaoyi::core::config::{Config, ConfigBuilder, ConfigSource};
-pub use xiaoyi::core::config::source::file::FileSource;
-pub use xiaoyi::core::config::source::ConfigSource as AsyncConfigSource;
-pub use xiaoyi::core::error::{XiaoyiError, ErrorKind, Result};
-pub use xiaoyi::core::result::{Status, ResultExt};
-pub use xiaoyi::domain::token::{PrimitiveKind, IntKind, IntWidth, IntType, FloatKind, SyntaxKind};
-pub use xiaoyi::llm;
-pub use xiaoyi::llm::client::{LlmClient, ChatRequest, ChatResponse, ChatMessage, MessageRole, Usage};
-pub use xiaoyi::workflow;
-pub use xiaoyi::workflow::dag::{Dag, DagNode, DagEdge, DagGraph};
-pub use xiaoyi::workflow::dag::graph::{NodeId, NodeKind, EdgeKind};
-pub use xiaoyi::memory::stm::{StmCache, CacheEntry, CacheStats, LruCache};
 pub use xiaoyi::builder::AgentBuilder;
-pub use xiaoyi::orchestrator::Orchestrator;
-pub use xiaoyi::gateway::Gateway;
-pub use xiaoyi::lexer;
+pub use xiaoyi::core::config::{Config, ConfigBuilder};
+pub use xiaoyi::core::config::source::ConfigSource;
+pub use xiaoyi::core::config::source::env::EnvSource;
+pub use xiaoyi::core::config::source::file::FileSource;
+pub use xiaoyi::core::config::source::vault::VaultSource;
+pub use xiaoyi::core::error::{ErrorKind, XiaoyiError, Result};
+pub use xiaoyi::core::result::Status;
+pub use xiaoyi::critic::{CriticPlant, ReviewResult, Severity};
+pub use xiaoyi::evaluator::{
+    SandboxResult, BuildResult, TestResult, TestType, AnalysisFinding, Severity,
+    BenchmarkResult, TokenUsage, GateResult, GateStatus, EvaluationResult, Evaluator,
+};
 pub use xiaoyi::lexer::Lexer;
-pub use xiaoyi::lexer::scanner::Scanner;
-pub use xiaoyi::lexer::token::Token;
-
+pub use xiaoyi::llm::client::{ChatMessage, ChatRequest, ChatResponse, ChatChoice, Usage, LlmClient, MessageRole};
+pub use xiaoyi::memory::stm::cache::LruCache;
+pub use xiaoyi::orchestrator::Orchestrator;
+pub use xiaoyi::workflow::dag::{Dag, DagEdge, DagGraph, DagNode, NodeKind, EdgeKind, NodeId};
 /// Initialize the runtime.
 ///
 /// @param config Optional configuration
 /// @return Initialized runtime handle
 /// @since 0.1.0
 /// @threadsafe
-pub async fn init(config: Option<xiaoyi::core::config::Config>) -> xiaoyi::core::error::Result<Runtime> {
+pub async fn init(
+    config: Option<xiaoyi::core::config::Config>,
+) -> xiaoyi::core::error::Result<Runtime> {
     let config = config.unwrap_or_default();
     tracing_subscriber::fmt::init();
     Ok(Runtime { config })

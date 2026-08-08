@@ -12,12 +12,12 @@
 //! @see crate::builder
 
 use pretty_assertions::assert_eq;
-use xiaoyi::{Config, ConfigBuilder, Result, XiaoyiError, ErrorKind, Status, ResultExt};
-use xiaoyi::{FileSource, AsyncConfigSource, LruCache, DagGraph, DagNode, DagEdge};
-use xiaoyi::workflow::dag::graph::{NodeId, NodeKind, EdgeKind};
-use xiaoyi::{AgentBuilder, Orchestrator, Gateway, Lexer};
-use xiaoyi::llm::client::{MessageRole, ChatMessage, ChatRequest};
 use tempfile;
+use xiaoyi::llm::client::{ChatMessage, ChatRequest, MessageRole};
+use xiaoyi::workflow::dag::graph::{EdgeKind, NodeId, NodeKind};
+use xiaoyi::{AgentBuilder, Gateway, Lexer, Orchestrator};
+use xiaoyi::{AsyncConfigSource, DagEdge, DagGraph, DagNode, FileSource, LruCache};
+use xiaoyi::{Config, ConfigBuilder, ErrorKind, Result, ResultExt, Status, XiaoyiError};
 
 #[test]
 fn test_config_to_orchestrator_to_builder() {
@@ -43,8 +43,7 @@ fn test_config_to_orchestrator_to_builder() {
 #[test]
 fn test_error_result_workflow() {
     fn fallible_operation() -> Result<i32> {
-        Err(XiaoyiError::new(ErrorKind::Config, "simulated failure")
-            .with_meta("key", "value"))
+        Err(XiaoyiError::new(ErrorKind::Config, "simulated failure").with_meta("key", "value"))
     }
 
     let result = fallible_operation();
@@ -53,7 +52,10 @@ fn test_error_result_workflow() {
     let err = result.unwrap_err();
     assert_eq!(err.kind, ErrorKind::Config);
     assert_eq!(err.message, "simulated failure");
-    assert_eq!(err.meta.iter().find(|(k, _)| k == "key").map(|(_, v)| v), Some(&"value".to_string()));
+    assert_eq!(
+        err.meta.iter().find(|(k, _)| k == "key").map(|(_, v)| v),
+        Some(&"value".to_string())
+    );
 
     // Test ResultExt recovery with a fresh result
     let recovered: Result<i32> = fallible_operation().or_else(|_| Ok(42));
@@ -74,7 +76,11 @@ fn test_status_error_conversion() {
 fn test_lru_cache_integration() {
     let cache: LruCache<String, String> = LruCache::new(100);
     cache.insert("config:server:port".to_string(), "8080".to_string(), None);
-    cache.insert("config:server:host".to_string(), "localhost".to_string(), None);
+    cache.insert(
+        "config:server:host".to_string(),
+        "localhost".to_string(),
+        None,
+    );
 
     let port: Option<String> = cache.get(&"config:server:port".to_string());
     assert_eq!(port, Some("8080".to_string()));
@@ -87,23 +93,38 @@ fn test_lru_cache_integration() {
 fn test_config_with_file_source() {
     let temp_dir = tempfile::tempdir().unwrap();
     let file_path = temp_dir.path().join("smoke.toml");
-    std::fs::write(&file_path, r#"
+    std::fs::write(
+        &file_path,
+        r#"
         [agent]
         name = "smoke"
         model = "gpt-4"
         temperature = 0.5
-    "#).unwrap();
+    "#,
+    )
+    .unwrap();
 
     let source = FileSource::new(file_path.to_str().unwrap());
     let data = tokio_test::block_on(source.load()).unwrap();
 
-    let name: String = data.get("agent.name").and_then(|v| v.as_str()).unwrap().to_string();
+    let name: String = data
+        .get("agent.name")
+        .and_then(|v| v.as_str())
+        .unwrap()
+        .to_string();
     assert_eq!(name, "smoke");
 
-    let model: String = data.get("agent.model").and_then(|v| v.as_str()).unwrap().to_string();
+    let model: String = data
+        .get("agent.model")
+        .and_then(|v| v.as_str())
+        .unwrap()
+        .to_string();
     assert_eq!(model, "gpt-4");
 
-    let temp: f64 = data.get("agent.temperature").and_then(|v| v.as_f64()).unwrap();
+    let temp: f64 = data
+        .get("agent.temperature")
+        .and_then(|v| v.as_f64())
+        .unwrap();
     assert!((temp - 0.5).abs() < f64::EPSILON);
 }
 
@@ -123,8 +144,18 @@ fn test_full_stack_types_compilation() {
     let _gateway = Gateway::new(Config::default());
     let _lexer = Lexer::new("test");
     let _role = MessageRole::User;
-    let _msg = ChatMessage { role: MessageRole::User, content: "".into(), name: None };
-    let _req = ChatRequest { model: "".into(), messages: vec![], temperature: None, max_tokens: None, stream: false };
+    let _msg = ChatMessage {
+        role: MessageRole::User,
+        content: "".into(),
+        name: None,
+    };
+    let _req = ChatRequest {
+        model: "".into(),
+        messages: vec![],
+        temperature: None,
+        max_tokens: None,
+        stream: false,
+    };
 
     // If this compiles, the types work together
     assert!(true);
@@ -133,12 +164,36 @@ fn test_full_stack_types_compilation() {
 #[test]
 fn test_dag_with_config_integration() {
     let mut graph = DagGraph::new();
-    graph.add_node(DagNode::new(NodeId::new("load-config"), "Load Config", NodeKind::Task));
-    graph.add_node(DagNode::new(NodeId::new("validate"), "Validate", NodeKind::Task));
-    graph.add_node(DagNode::new(NodeId::new("execute"), "Execute", NodeKind::Task));
+    graph.add_node(DagNode::new(
+        NodeId::new("load-config"),
+        "Load Config",
+        NodeKind::Task,
+    ));
+    graph.add_node(DagNode::new(
+        NodeId::new("validate"),
+        "Validate",
+        NodeKind::Task,
+    ));
+    graph.add_node(DagNode::new(
+        NodeId::new("execute"),
+        "Execute",
+        NodeKind::Task,
+    ));
 
-    graph.add_edge(DagEdge::new(NodeId::new("load-config"), NodeId::new("validate"), EdgeKind::Sequential)).unwrap();
-    graph.add_edge(DagEdge::new(NodeId::new("validate"), NodeId::new("execute"), EdgeKind::Sequential)).unwrap();
+    graph
+        .add_edge(DagEdge::new(
+            NodeId::new("load-config"),
+            NodeId::new("validate"),
+            EdgeKind::Sequential,
+        ))
+        .unwrap();
+    graph
+        .add_edge(DagEdge::new(
+            NodeId::new("validate"),
+            NodeId::new("execute"),
+            EdgeKind::Sequential,
+        ))
+        .unwrap();
 
     let order = graph.topological_order().unwrap();
     assert_eq!(order.len(), 3);
