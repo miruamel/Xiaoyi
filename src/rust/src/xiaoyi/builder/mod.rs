@@ -32,6 +32,7 @@
 pub mod ast;
 pub mod codegen;
 pub mod formatter;
+pub mod lint;
 pub mod template;
 pub mod validator;
 

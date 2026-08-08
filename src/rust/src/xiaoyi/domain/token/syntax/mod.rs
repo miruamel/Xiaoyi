@@ -18,6 +18,7 @@
 //! @see crate::domain::token
 //! @see crate::domain::token::primitive
 //! @see crate::lexer
+pub mod comment;
 pub mod keyword;
 pub mod operator;
 pub mod punctuation;

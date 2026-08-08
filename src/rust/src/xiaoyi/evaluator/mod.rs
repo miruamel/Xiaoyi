@@ -37,6 +37,7 @@ pub mod benchmark;
 pub mod build;
 pub mod feedback;
 pub mod gates;
+pub mod report;
 pub mod sandbox;
 pub mod test;
 
