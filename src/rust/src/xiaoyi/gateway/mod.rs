@@ -29,6 +29,8 @@
 /// ```
 pub mod api;
 pub mod cli;
+pub mod middleware;
+pub mod route;
 pub mod web;
 
 use crate::xiaoyi::core::config::Config;

@@ -19,3 +19,4 @@
 //! @see crate::llm::client::anthropic
 //! @see crate::llm::client::ollama
 pub mod client;
+pub mod prompt;
