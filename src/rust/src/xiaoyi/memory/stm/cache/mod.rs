@@ -33,6 +33,15 @@ impl<V> CacheEntry<V> {
             hits: 0,
             created_at: 0,
             ttl,
+    pub fn new(key: impl Into<String>, value: impl Into<String>, ttl: Option<Duration>) -> Self {
+        let key = key.into();
+        let value = value.into();
+        Self {
+            key,
+            value,
+            hits: 0,
+            created_at: 0,
+            ttl,
         }
     }
 
