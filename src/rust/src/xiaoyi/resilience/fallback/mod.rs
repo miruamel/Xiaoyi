@@ -12,6 +12,8 @@
 //! @see crate::resilience
 //! @see crate::resilience::circuit_breaker
 
+pub mod strategy;
+
 /// Fallback handler for degraded operation.
 ///
 /// @brief Provides fallback when primary fails

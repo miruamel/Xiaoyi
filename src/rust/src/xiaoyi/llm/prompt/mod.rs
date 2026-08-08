@@ -11,4 +11,5 @@
 //! @author Miruamel
 //! @see crate::llm
 //! @see crate::llm::client
+pub mod chat;
 pub mod template;

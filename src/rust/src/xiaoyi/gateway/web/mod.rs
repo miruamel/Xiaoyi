@@ -11,6 +11,8 @@
 //! @author Miruamel
 //! @see crate::gateway
 
+pub mod static_;
+
 /// Web server configuration.
 ///
 /// @brief Web server settings

@@ -19,6 +19,7 @@
 pub mod openapi;
 pub mod schema;
 pub mod schema_store;
+pub mod spec;
 
 pub use openapi::OpenApiStore;
 pub use schema::{Schema, SchemaField, SchemaKind};

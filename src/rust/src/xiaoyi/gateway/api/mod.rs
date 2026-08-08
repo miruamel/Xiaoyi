@@ -11,6 +11,9 @@
 //! @author Miruamel
 //! @see crate::gateway
 
+pub mod graphql;
+pub mod rest;
+
 /// API server configuration.
 ///
 /// @brief API server settings
