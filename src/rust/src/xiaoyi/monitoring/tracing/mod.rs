@@ -1,3 +1,5 @@
+pub mod context;
+pub mod exporter;
 /// # Layer 9 — Monitoring (Tracing)
 ///
 /// `monitoring` is the observability substrate. It provides a `Tracer` for span-based tracing
@@ -21,11 +23,8 @@
 /// @since 0.1.0
 /// @author Miruamel
 /// @see crate::xiaoyi::monitoring
-
 pub mod span;
-pub mod context;
-pub mod exporter;
 
-pub use span::{SpanKind, Span};
 pub use context::SpanContext;
 pub use exporter::{TraceExporter, Tracer};
+pub use span::{Span, SpanKind};

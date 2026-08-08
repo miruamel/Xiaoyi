@@ -38,7 +38,11 @@ impl Default for TestConfig {
     fn default() -> Self {
         Self {
             command: "cargo".to_string(),
-            args: vec!["test".to_string(), "--".to_string(), "--nocapture".to_string()],
+            args: vec![
+                "test".to_string(),
+                "--".to_string(),
+                "--nocapture".to_string(),
+            ],
             workdir: "/workspace".to_string(),
             timeout_secs: 120,
             parallel: 4,
@@ -112,15 +116,13 @@ impl TestRunner {
     /// @return Vector of property test results
     /// @since 0.1.0
     pub async fn run_property_tests(&self) -> Result<Vec<TestResult>> {
-        let results = vec![
-            TestResult {
-                name: "prop_test_1".to_string(),
-                passed: true,
-                duration_ms: 200,
-                message: None,
-                test_type: TestType::Property,
-            },
-        ];
+        let results = vec![TestResult {
+            name: "prop_test_1".to_string(),
+            passed: true,
+            duration_ms: 200,
+            message: None,
+            test_type: TestType::Property,
+        }];
         Ok(results)
     }
 }

@@ -17,8 +17,6 @@
 //! @see crate::domain::token::syntax
 //! @see crate::domain::token::syntax::keyword
 
-
-
 /// Operator token.
 ///
 /// @brief Operator with precedence and associativity

@@ -17,8 +17,6 @@
 //! @see crate::domain::token::syntax
 //! @see crate::domain::token::syntax::operator
 
-
-
 /// Keyword token.
 ///
 /// @brief Reserved keyword with text

@@ -14,10 +14,10 @@
 //! @see crate::monitoring
 //! @see crate::xiaoyi::core::error
 
-pub mod cost;
 pub mod budget;
+pub mod cost;
 pub mod tracker;
 
-pub use cost::CostEstimate;
 pub use budget::Budget;
+pub use cost::CostEstimate;
 pub use tracker::CostTracker;

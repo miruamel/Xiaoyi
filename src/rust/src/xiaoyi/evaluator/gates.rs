@@ -13,8 +13,8 @@
 //! @see crate::evaluator::analysis
 //! @see crate::critic::aggregator
 
-use crate::xiaoyi::evaluator::{GateResult, GateStatus, Severity};
 use crate::xiaoyi::evaluator::AnalysisFinding;
+use crate::xiaoyi::evaluator::{GateResult, GateStatus, Severity};
 
 /// Quality gate configuration.
 ///
@@ -99,7 +99,10 @@ impl GateEvaluator {
             message: if passed {
                 "All tests passed".to_string()
             } else {
-                format!("{} tests failed", test_results.iter().filter(|t| !t.passed).count())
+                format!(
+                    "{} tests failed",
+                    test_results.iter().filter(|t| !t.passed).count()
+                )
             },
         });
         if !passed && self.config.require_all_tests_pass {
@@ -107,28 +110,40 @@ impl GateEvaluator {
         }
 
         // Critical findings gate
-        let critical_count = findings.iter().filter(|f| f.severity == Severity::Critical).count();
+        let critical_count = findings
+            .iter()
+            .filter(|f| f.severity == Severity::Critical)
+            .count();
         let passed = critical_count <= self.config.max_critical_findings;
         gates.push(GateResult {
             name: "critical_findings".to_string(),
             passed,
             threshold: self.config.max_critical_findings as f64,
             actual: critical_count as f64,
-            message: format!("{} critical findings (max {})", critical_count, self.config.max_critical_findings),
+            message: format!(
+                "{} critical findings (max {})",
+                critical_count, self.config.max_critical_findings
+            ),
         });
         if !passed {
             overall_pass = false;
         }
 
         // High findings gate
-        let high_count = findings.iter().filter(|f| f.severity == Severity::Error).count();
+        let high_count = findings
+            .iter()
+            .filter(|f| f.severity == Severity::Error)
+            .count();
         let passed = high_count <= self.config.max_high_findings;
         gates.push(GateResult {
             name: "high_findings".to_string(),
             passed,
             threshold: self.config.max_high_findings as f64,
             actual: high_count as f64,
-            message: format!("{} high findings (max {})", high_count, self.config.max_high_findings),
+            message: format!(
+                "{} high findings (max {})",
+                high_count, self.config.max_high_findings
+            ),
         });
         if !passed {
             overall_pass = false;
@@ -142,7 +157,10 @@ impl GateEvaluator {
                 passed,
                 threshold: self.config.max_execution_time_ms as f64,
                 actual: b.execution_time_ms as f64,
-                message: format!("{}ms (max {}ms)", b.execution_time_ms, self.config.max_execution_time_ms),
+                message: format!(
+                    "{}ms (max {}ms)",
+                    b.execution_time_ms, self.config.max_execution_time_ms
+                ),
             });
             if !passed {
                 overall_pass = false;
@@ -157,7 +175,11 @@ impl GateEvaluator {
                 passed,
                 threshold: self.config.max_memory_bytes as f64,
                 actual: b.memory_peak_bytes as f64,
-                message: format!("{}MB (max {}MB)", b.memory_peak_bytes / 1024 / 1024, self.config.max_memory_bytes / 1024 / 1024),
+                message: format!(
+                    "{}MB (max {}MB)",
+                    b.memory_peak_bytes / 1024 / 1024,
+                    self.config.max_memory_bytes / 1024 / 1024
+                ),
             });
             if !passed {
                 overall_pass = false;
@@ -172,13 +194,19 @@ impl GateEvaluator {
                 passed,
                 threshold: self.config.max_cost_usd,
                 actual: b.estimated_cost_usd,
-                message: format!("${:.4} (max ${:.2})", b.estimated_cost_usd, self.config.max_cost_usd),
+                message: format!(
+                    "${:.4} (max ${:.2})",
+                    b.estimated_cost_usd, self.config.max_cost_usd
+                ),
             });
             if !passed {
                 overall_pass = false;
             }
         }
 
-        GateStatus { overall_pass, gates }
+        GateStatus {
+            overall_pass,
+            gates,
+        }
     }
 }

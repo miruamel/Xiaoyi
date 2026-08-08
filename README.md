@@ -1,7 +1,7 @@
 # Xiaoyi
 
 [![CI](https://github.com/miruamel/Xiaoyi/actions/workflows/ci.yml/badge.svg)](https://github.com/miruamel/Xiaoyi/actions/workflows/ci.yml)
-[![Rust](https://img.shields.io/badge/rust-1.82%2B-orange.svg)](https://www.rust-lang.org)
+[![Rust](https://img.shields.io/badge/rust-1.99--nightly-orange.svg)](https://www.rust-lang.org)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org)
 [![TypeScript](https://img.shields.io/badge/typescript-5.0%2B-blue.svg)](https://www.typescriptlang.org)
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-green.svg)](LICENSE)
@@ -99,7 +99,7 @@ console.log(resp.choices[0].message.content);
 
 ### Prerequisites
 
-- Rust 1.82+
+- Rust 1.99 nightly
 - Python 3.12+
 - Node.js 20+
 

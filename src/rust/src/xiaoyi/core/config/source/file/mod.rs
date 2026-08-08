@@ -140,11 +140,12 @@ impl ConfigSource for FileSource {
                         .with_meta("error", &e.to_string())
                 })?,
                 _ => {
-                    return Err(
-                        XiaoyiError::new(ErrorKind::Config, "unsupported config file format")
-                            .with_meta("path", &self.path)
-                            .with_meta("extension", ext),
-                    );
+                    return Err(XiaoyiError::new(
+                        ErrorKind::Config,
+                        "unsupported config file format",
+                    )
+                    .with_meta("path", &self.path)
+                    .with_meta("extension", ext));
                 }
             };
 

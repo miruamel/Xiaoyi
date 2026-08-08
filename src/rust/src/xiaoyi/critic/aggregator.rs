@@ -15,7 +15,9 @@
 //! @see crate::critic::small_llm
 //! @see crate::critic::large_llm
 
-use crate::xiaoyi::critic::{RuleFinding, SmallLlmFinding, LargeLlmFinding, ReviewResult, Severity};
+use crate::xiaoyi::critic::{
+    LargeLlmFinding, ReviewResult, RuleFinding, Severity, SmallLlmFinding,
+};
 
 /// Aggregator weights for different critic stages.
 ///
@@ -140,7 +142,8 @@ impl Aggregator {
         for finding in findings {
             let is_dominated = pareto.iter().any(|p: &RuleFinding| {
                 severity_weight(p.severity) >= severity_weight(finding.severity)
-                    && (p.line.is_some() && finding.line.is_some()
+                    && (p.line.is_some()
+                        && finding.line.is_some()
                         && p.line.unwrap() <= finding.line.unwrap())
             });
 

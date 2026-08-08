@@ -12,7 +12,6 @@
 //! @see crate::resilience
 //! @see crate::evaluator
 
-
 /// Health check status.
 ///
 /// @brief Status of a health check

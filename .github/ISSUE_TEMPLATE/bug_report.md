@@ -16,7 +16,7 @@ A clear and concise description of what the bug is.
 - Language binding: [Rust, TypeScript, Python, All]
 - Xiaoyi version: [e.g., 0.1.0]
 - Language/runtime version:
-  - Rust: [e.g., 1.82]
+  - Rust: [e.g., 1.99-nightly]
   - Node.js: [e.g., 20.10]
   - Python: [e.g., 3.12]
 

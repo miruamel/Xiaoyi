@@ -56,10 +56,10 @@ use crate::xiaoyi::monitoring::MetricRegistry;
 
 use crate::xiaoyi::critic::CriticPlant;
 use crate::xiaoyi::evaluator::Evaluator;
+use crate::xiaoyi::resilience::ResiliencePipeline;
 use crate::xiaoyi::resilience::circuit_breaker::CircuitBreaker;
 use crate::xiaoyi::resilience::retry::RetryPolicy;
 use crate::xiaoyi::resilience::{CircuitBreakerConfig, RetryConfig};
-use crate::xiaoyi::resilience::ResiliencePipeline;
 
 /// Summary produced by [`Orchestrator::orchestrate`].
 ///

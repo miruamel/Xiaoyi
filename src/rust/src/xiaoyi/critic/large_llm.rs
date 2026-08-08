@@ -13,8 +13,8 @@
 //! @see crate::critic
 //! @see crate::critic::small_llm
 
-use crate::xiaoyi::critic::LargeLlmFinding;
 use crate::xiaoyi::core::error::Result;
+use crate::xiaoyi::critic::LargeLlmFinding;
 use crate::xiaoyi::llm::client::LlmClient;
 
 /// Large LLM critic for security analysis.
@@ -63,7 +63,11 @@ impl SecurityCritic {
         };
 
         let response = self.client.chat(request).await?;
-        let content = response.choices.first().map(|c| c.message.content.clone()).unwrap_or_default();
+        let content = response
+            .choices
+            .first()
+            .map(|c| c.message.content.clone())
+            .unwrap_or_default();
 
         let findings: Vec<LargeLlmFinding> = serde_json::from_str(&content).unwrap_or_default();
         Ok(findings)
@@ -110,7 +114,11 @@ impl ArchitectureCritic {
         };
 
         let response = self.client.chat(request).await?;
-        let content = response.choices.first().map(|c| c.message.content.clone()).unwrap_or_default();
+        let content = response
+            .choices
+            .first()
+            .map(|c| c.message.content.clone())
+            .unwrap_or_default();
 
         let findings: Vec<LargeLlmFinding> = serde_json::from_str(&content).unwrap_or_default();
         Ok(findings)
@@ -163,7 +171,11 @@ impl LogicCritic {
         };
 
         let response = self.client.chat(request).await?;
-        let content = response.choices.first().map(|c| c.message.content.clone()).unwrap_or_default();
+        let content = response
+            .choices
+            .first()
+            .map(|c| c.message.content.clone())
+            .unwrap_or_default();
 
         let findings: Vec<LargeLlmFinding> = serde_json::from_str(&content).unwrap_or_default();
         Ok(findings)

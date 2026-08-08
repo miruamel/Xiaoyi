@@ -31,5 +31,5 @@ pub mod notifier;
 pub mod rule;
 
 pub use alert::{Alert, AlertSeverity};
+pub use notifier::{AlertManager, Notifier};
 pub use rule::AlertRule;
-pub use notifier::{Notifier, AlertManager};

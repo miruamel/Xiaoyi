@@ -11,7 +11,6 @@
 //! @author Miruamel
 //! @see crate::resilience
 
-
 /// Timeout configuration.
 ///
 /// @brief Timeout settings

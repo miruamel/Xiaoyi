@@ -4,12 +4,12 @@
 //! @since 0.1.0
 //! @author Miruamel
 
+use crate::xiaoyi::core::error::Result;
 use crate::xiaoyi::knowledge::vector::index::SearchResult;
 use crate::xiaoyi::knowledge::vector::store::VectorStore;
-use crate::xiaoyi::core::error::Result;
+use async_trait::async_trait;
 use indexmap::IndexMap;
 use parking_lot::RwLock;
-use async_trait::async_trait;
 use std::sync::Arc;
 
 /// In-memory vector store providing fast local access to vector embeddings.
@@ -48,8 +48,16 @@ impl VectorStore for InMemoryVectorStore {
             });
         }
 
-        results.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal));
-        let results = if results.len() > top_k { results[..top_k].to_vec() } else { results };
+        results.sort_by(|a, b| {
+            b.score
+                .partial_cmp(&a.score)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
+        let results = if results.len() > top_k {
+            results[..top_k].to_vec()
+        } else {
+            results
+        };
 
         Ok(results)
     }

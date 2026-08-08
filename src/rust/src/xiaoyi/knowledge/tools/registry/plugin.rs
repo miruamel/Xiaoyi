@@ -30,8 +30,8 @@
 use std::fmt;
 use std::sync::Arc;
 
-use serde_json;
 use crate::xiaoyi::core::error::Result;
+use serde_json;
 
 /// Trait that all tool handlers must implement.
 ///

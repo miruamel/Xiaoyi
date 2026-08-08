@@ -12,7 +12,6 @@
 //! @see crate::resilience
 //! @see crate::resilience::circuit_breaker
 
-
 /// Fallback handler for degraded operation.
 ///
 /// @brief Provides fallback when primary fails

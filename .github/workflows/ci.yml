@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  RUST_VERSION: '1.82'
+  RUST_VERSION: '1.99-nightly'
   NODE_VERSION: '20'
   PYTHON_VERSION: '3.12'
 

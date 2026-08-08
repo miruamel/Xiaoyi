@@ -24,4 +24,4 @@ pub use gauge::Gauge;
 pub use histogram::Histogram;
 pub use registry::MetricRegistry;
 
-pub use histogram::{HistogramSnapshot, HistogramBucket};
+pub use histogram::{HistogramBucket, HistogramSnapshot};

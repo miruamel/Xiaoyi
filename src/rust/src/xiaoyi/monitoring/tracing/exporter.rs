@@ -73,7 +73,6 @@ pub struct Tracer {
     exporter: RwLock<Option<Arc<dyn TraceExporter>>>,
 }
 
-
 impl Tracer {
     /// Creates a new tracer without an exporter.
     ///

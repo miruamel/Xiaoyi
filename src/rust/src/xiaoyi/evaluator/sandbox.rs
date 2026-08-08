@@ -39,7 +39,7 @@ pub struct SandboxConfig {
 impl Default for SandboxConfig {
     fn default() -> Self {
         Self {
-            image: "rust:1.82".to_string(),
+            image: "rust:1.99-nightly".to_string(),
             memory_limit: 512 * 1024 * 1024, // 512 MB
             cpu_limit: 1.0,
             timeout_secs: 60,

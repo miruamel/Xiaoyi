@@ -24,4 +24,3 @@ pub mod file;
 pub mod vault;
 
 pub use crate::xiaoyi::core::config::ConfigSource;
-

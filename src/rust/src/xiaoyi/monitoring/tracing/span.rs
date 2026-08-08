@@ -195,11 +195,10 @@ impl Span {
     /// @since 0.1.0
     pub fn finish(&mut self) -> Result<()> {
         if self.end.is_some() {
-            return Err(XiaoyiError::new(
-                ErrorKind::State,
-                "span has already been finished",
-            )
-            .with_meta("span_id", self.id.clone()));
+            return Err(
+                XiaoyiError::new(ErrorKind::State, "span has already been finished")
+                    .with_meta("span_id", self.id.clone()),
+            );
         }
         self.end = Some(now_secs());
         Ok(())
@@ -212,7 +211,11 @@ impl Span {
     /// @param value Attribute value
     /// @return `Ok(())` on success
     /// @since 0.1.0
-    pub fn set_attribute(&mut self, key: impl Into<String>, value: impl Into<String>) -> Result<()> {
+    pub fn set_attribute(
+        &mut self,
+        key: impl Into<String>,
+        value: impl Into<String>,
+    ) -> Result<()> {
         self.attributes.insert(key.into(), value.into());
         Ok(())
     }

@@ -20,9 +20,9 @@ use crate::xiaoyi::builder::ast::AgentAst;
 /// @since 0.1.0
 pub fn generate_rust(ast: &AgentAst) -> String {
     format!(
-        r#"// Generated agent: {}
+        r"// Generated agent: {}
 struct {}({});
-"#,
+",
         ast.name, ast.name, ast.model
     )
 }

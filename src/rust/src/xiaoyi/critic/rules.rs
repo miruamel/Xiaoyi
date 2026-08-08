@@ -12,8 +12,8 @@
 //! @see crate::critic
 //! @see crate::critic::small_llm
 
-use crate::xiaoyi::critic::{RuleFinding, Severity};
 use crate::xiaoyi::core::error::Result;
+use crate::xiaoyi::critic::{RuleFinding, Severity};
 
 /// Rules engine for fast static analysis.
 ///
@@ -88,7 +88,10 @@ impl RulesEngine {
         rules.push(Rule {
             id: "HARDCODED_SECRET".to_string(),
             name: "Hardcoded Secret".to_string(),
-            pattern: regex::Regex::new(r#"(?i)(api_key|secret|password|token)\s*=\s*["'][^"']+["']"#).expect("invalid regex"),
+            pattern: regex::Regex::new(
+                r#"(?i)(api_key|secret|password|token)\s*=\s*["'][^"']+["']"#,
+            )
+            .expect("invalid regex"),
             severity: Severity::Critical,
             description: "Potential hardcoded secret".to_string(),
         });

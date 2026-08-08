@@ -7,5 +7,5 @@
 pub mod ast_graph;
 pub mod repo;
 
-pub use ast_graph::{AstGraph, AstNode, AstEdge, AstNodeKind, AstEdgeKind};
+pub use ast_graph::{AstEdge, AstEdgeKind, AstGraph, AstNode, AstNodeKind};
 pub use repo::RepoScanner;

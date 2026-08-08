@@ -73,12 +73,7 @@ impl Alert {
     /// @param message Human-readable description
     /// @return New `Alert` instance
     /// @since 0.1.0
-    pub fn new(
-        id: String,
-        rule_name: String,
-        severity: AlertSeverity,
-        message: String,
-    ) -> Self {
+    pub fn new(id: String, rule_name: String, severity: AlertSeverity, message: String) -> Self {
         let timestamp = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap_or_default()

@@ -5,14 +5,16 @@
 //! @author Miruamel
 //! @see crate::knowledge::graph::repo
 
-use std::path::{Path, PathBuf};
 use std::fs::{read_dir, read_to_string};
+use std::path::{Path, PathBuf};
 
 use regex::Regex;
 
 use crate::xiaoyi::core::error::Result;
 
-use crate::xiaoyi::knowledge::graph::ast_graph::{AstGraph, AstNode, AstNodeKind, AstEdge, AstEdgeKind};
+use crate::xiaoyi::knowledge::graph::ast_graph::{
+    AstEdge, AstEdgeKind, AstGraph, AstNode, AstNodeKind,
+};
 
 /// Scans a repository and builds an abstract syntax tree graph.
 #[derive(Debug, Clone)]
@@ -50,14 +52,22 @@ impl RepoScanner {
         let trait_pattern = Regex::new(r"\b(?:pub\s+)?trait\s+([A-Za-z_][A-Za-z0-9_]*)\")?;
         let impl_pattern = Regex::new(r"\b(?:pub\s+)?impl\s+([A-Za-z_][A-Za-z0-9_]*)\")?;
         let const_pattern = Regex::new(r"\b(?:pub\s+)?const\s+([A-Za-z_][A-Za-z0-9_]*)\")?;
-        let use_pattern = Regex::new(r"\buse\s+([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\")?;
+        let use_pattern =
+            Regex::new(r"\buse\s+([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\")?;
 
         // Walk the directory recursively.
-        self.walk_dir(&self.root, &mut graph, &mut id_counter, 
-                      Some(&fn_pattern), Some(&struct_pattern),
-                      Some(&enum_pattern), Some(&trait_pattern),
-                      Some(&impl_pattern), Some(&const_pattern),
-                      Some(&use_pattern))?;
+        self.walk_dir(
+            &self.root,
+            &mut graph,
+            &mut id_counter,
+            Some(&fn_pattern),
+            Some(&struct_pattern),
+            Some(&enum_pattern),
+            Some(&trait_pattern),
+            Some(&impl_pattern),
+            Some(&const_pattern),
+            Some(&use_pattern),
+        )?;
 
         Ok(graph)
     }
@@ -83,9 +93,10 @@ impl RepoScanner {
             let file_name = entry.file_name();
 
             // Skip hidden files/directories, target, and .git.
-            if file_name.to_string_lossy().starts_with('.') ||
-               file_name == "target" ||
-               file_name == ".git" {
+            if file_name.to_string_lossy().starts_with('.')
+                || file_name == "target"
+                || file_name == ".git"
+            {
                 continue;
             }
 
@@ -140,7 +151,8 @@ impl RepoScanner {
         use_pattern: Option<&Regex>,
     ) -> Result<()> {
         // Get relative path for label.
-        let rel_path = path.strip_prefix(&self.root)
+        let rel_path = path
+            .strip_prefix(&self.root)
             .unwrap_or(path)
             .to_string_lossy()
             .to_string();
@@ -148,12 +160,7 @@ impl RepoScanner {
         // Create Module node.
         let module_id = *id_counter;
         *id_counter += 1;
-        let module_node = AstNode::new(
-            module_id,
-            AstNodeKind::Module,
-            rel_path.clone(),
-            None,
-        );
+        let module_node = AstNode::new(module_id, AstNodeKind::Module, rel_path.clone(), None);
         graph.add_node(module_node);
 
         // Read file content.
