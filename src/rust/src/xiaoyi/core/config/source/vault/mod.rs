@@ -38,8 +38,6 @@ pub mod encrypt;
 pub mod key;
 
 use crate::xiaoyi::core::config::source::ConfigSource;
-use crate::xiaoyi::core::config::source::vault::decrypt::decrypt as vault_decrypt;
-use crate::xiaoyi::core::config::source::vault::key::load_key;
 use crate::xiaoyi::core::error::{ErrorKind, Result, XiaoyiError};
 use std::collections::HashMap;
 use std::fmt::Debug;
@@ -101,12 +99,18 @@ impl ConfigSource for VaultSource {
                     .with_meta("error", &e.to_string())
             })?;
 
-            let key = load_key()?;
-            let decrypted = vault_decrypt(&encrypted, &key).map_err(|e| {
-                XiaoyiError::new(ErrorKind::Config, "vault decryption failed")
-                    .with_meta("path", &self.path)
-                    .with_meta("error", &e.to_string())
-            })?;
+            let key = key::VaultKey.derive(
+                std::env::var("XIAOYI_VAULT_KEY")
+                    .unwrap_or_default()
+                    .as_bytes(),
+            )?;
+            let decrypted = decrypt::VaultDecryptor
+                .decrypt(&encrypted, &key)
+                .map_err(|e| {
+                    XiaoyiError::new(ErrorKind::Config, "vault decryption failed")
+                        .with_meta("path", &self.path)
+                        .with_meta("error", &e.to_string())
+                })?;
 
             let content = String::from_utf8(decrypted).map_err(|e| {
                 XiaoyiError::new(ErrorKind::Config, "vault content not valid UTF-8")
@@ -134,7 +138,7 @@ impl ConfigSource for VaultSource {
 /// @since 0.1.0
 /// @security Uses AES-256-GCM with random nonce
 pub fn encrypt(plaintext: &[u8], key: &[u8; 32]) -> Result<Vec<u8>> {
-    crate::xiaoyi::core::config::source::vault::encrypt::encrypt(plaintext, key)
+    crate::xiaoyi::core::config::source::vault::encrypt::VaultEncryptor.encrypt(plaintext, key)
 }
 
 /// Decrypt vault data.
@@ -146,5 +150,5 @@ pub fn encrypt(plaintext: &[u8], key: &[u8; 32]) -> Result<Vec<u8>> {
 /// @since 0.1.0
 /// @security Validates GCM authentication tag
 pub fn decrypt(ciphertext: &[u8], key: &[u8; 32]) -> Result<Vec<u8>> {
-    crate::xiaoyi::core::config::source::vault::decrypt::decrypt(ciphertext, key)
+    crate::xiaoyi::core::config::source::vault::decrypt::VaultDecryptor.decrypt(ciphertext, key)
 }

@@ -1,18 +1,18 @@
 use crate::xiaoyi::core::config::Config;
 
-/// GraphQL API controller.
+/// REST middleware stack.
 ///
-/// @brief GraphQL API controller
+/// @brief REST middleware configuration
 /// @since 0.1.0
 /// @author Miruamel
 #[derive(Debug, Clone, Default)]
-pub struct GraphQLController;
+pub struct RestMiddleware;
 
-impl GraphQLController {
-    /// Create controller from config.
+impl RestMiddleware {
+    /// Create middleware stack.
     ///
     /// @param config Gateway configuration
-    /// @return GraphQLController instance
+    /// @return RestMiddleware instance
     /// @since 0.1.0
     pub fn new(_config: &Config) -> Self {
         Self

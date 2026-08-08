@@ -1,3 +1,6 @@
+pub mod controller;
+pub mod middleware;
+
 use crate::xiaoyi::core::config::Config;
 
 /// REST API controller.
