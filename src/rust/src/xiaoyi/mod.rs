@@ -48,6 +48,7 @@ pub mod memory;
 pub mod monitoring;
 pub mod orchestrator;
 pub mod resilience;
+pub mod utils;
 pub mod workflow;
 
 // Knowledge re-exports

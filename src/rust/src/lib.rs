@@ -68,6 +68,8 @@ pub use xiaoyi::resilience::ResiliencePipeline;
 pub use xiaoyi::resilience::circuit_breaker::CircuitBreaker;
 pub use xiaoyi::resilience::retry::RetryPolicy;
 pub use xiaoyi::resilience::{CircuitBreakerConfig, RetryConfig};
+// Utils re-exports
+pub use xiaoyi::utils::{format_duration, generate_id, slugify, truncate};
 // Module trees used by integration tests
 pub use xiaoyi::gateway;
 pub use xiaoyi::llm;
