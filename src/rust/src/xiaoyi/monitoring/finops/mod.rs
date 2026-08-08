@@ -16,6 +16,7 @@
 
 pub mod budget;
 pub mod cost;
+pub mod pricing;
 pub mod tracker;
 
 pub use budget::Budget;
