@@ -12,7 +12,6 @@
 //! @see crate::resilience
 //! @complexity O(1) semaphore operations
 
-use crate::xiaoyi::core::error::Result;
 
 /// Bulkhead configuration.
 ///

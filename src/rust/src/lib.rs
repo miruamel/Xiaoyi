@@ -51,7 +51,7 @@ pub use xiaoyi::lexer;
 pub use xiaoyi::domain::token::SyntaxKind;
 pub use xiaoyi::llm::client::{ChatMessage, ChatRequest, ChatResponse, ChatChoice, Usage, LlmClient, MessageRole};
 pub use xiaoyi::memory::stm::cache::LruCache;
-pub use xiaoyi::orchestrator::Orchestrator;
+pub use xiaoyi::orchestrator::{Orchestrator, OrchestrationReport};
 pub use xiaoyi::knowledge::{
     EntryKind, KnowledgeBase, KnowledgeConfig, KnowledgeEntry, KnowledgeStats,
 };
@@ -61,6 +61,11 @@ pub use xiaoyi::monitoring::{
     Counter, Gauge, Histogram, HistogramSnapshot, MetricRegistry, Span, SpanContext, SpanKind,
     TraceExporter, Tracer,
 };
+// Resilience re-exports
+pub use xiaoyi::resilience::circuit_breaker::CircuitBreaker;
+pub use xiaoyi::resilience::retry::RetryPolicy;
+pub use xiaoyi::resilience::ResiliencePipeline;
+pub use xiaoyi::resilience::{CircuitBreakerConfig, RetryConfig};
 // Module trees used by integration tests
 pub use xiaoyi::workflow;
 pub use xiaoyi::llm;

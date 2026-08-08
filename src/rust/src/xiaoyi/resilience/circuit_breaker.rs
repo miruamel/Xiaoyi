@@ -12,7 +12,6 @@
 //! @see crate::resilience
 //! @see crate::resilience::retry
 
-use crate::xiaoyi::core::error::Result;
 use crate::xiaoyi::resilience::CircuitBreakerConfig;
 
 /// Circuit breaker states.

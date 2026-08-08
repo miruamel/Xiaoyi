@@ -41,7 +41,6 @@ pub mod health;
 pub mod retry;
 pub mod timeout;
 
-use crate::xiaoyi::core::error::Result;
 
 /// Resilience pipeline for fault-tolerant execution.
 ///
@@ -97,12 +96,12 @@ impl ResiliencePipeline {
     /// @example
     /// ```rust
     /// let result = pipeline.execute(|| async {
-    ///     Ok::<_, ResilienceError>("success".to_string())
-    /// }).await?;
+///     Ok("success".to_string())
+/// }).await?;
     /// ```
     /// @since 0.1.0
     /// @security Limits resource exhaustion via bulkhead
-    pub async fn execute<F, Fut, T, E>(&self, operation: F) -> Result<T, E>
+    pub async fn execute<F, Fut, T, E>(&self, operation: F) -> std::result::Result<T, E>
     where
         F: Fn() -> Fut,
         Fut: std::future::Future<Output = std::result::Result<T, E>>,

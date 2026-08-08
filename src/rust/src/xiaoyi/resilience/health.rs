@@ -12,7 +12,6 @@
 //! @see crate::resilience
 //! @see crate::evaluator
 
-use crate::xiaoyi::core::error::Result;
 
 /// Health check status.
 ///
@@ -75,7 +74,7 @@ impl HealthChecker {
     pub async fn check_all(&self) -> std::result::Result<Vec<HealthCheckResult>, String> {
         let mut results = Vec::new();
 
-        for check in &self.checks {
+        for _check in &self.checks {
             let result = HealthCheckResult {
                 status: HealthStatus::Healthy,
                 response_time_ms: 10,

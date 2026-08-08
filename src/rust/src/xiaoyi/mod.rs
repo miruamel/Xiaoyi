@@ -47,6 +47,7 @@ pub mod lexer;
 pub mod llm;
 pub mod memory;
 pub mod orchestrator;
+pub mod resilience;
 pub mod workflow;
 
 // Knowledge re-exports

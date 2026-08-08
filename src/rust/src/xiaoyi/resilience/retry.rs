@@ -13,7 +13,6 @@
 //! @see crate::resilience::circuit_breaker
 //! @complexity O(max_attempts) per operation
 
-use crate::xiaoyi::core::error::Result;
 use crate::xiaoyi::resilience::RetryConfig;
 
 /// Retry policy for operation execution.

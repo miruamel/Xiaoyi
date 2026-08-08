@@ -11,7 +11,6 @@
 //! @author Miruamel
 //! @see crate::resilience
 
-use crate::xiaoyi::core::error::Result;
 
 /// Timeout configuration.
 ///

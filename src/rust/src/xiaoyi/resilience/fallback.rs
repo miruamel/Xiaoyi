@@ -12,7 +12,6 @@
 //! @see crate::resilience
 //! @see crate::resilience::circuit_breaker
 
-use crate::xiaoyi::core::error::Result;
 
 /// Fallback handler for degraded operation.
 ///
