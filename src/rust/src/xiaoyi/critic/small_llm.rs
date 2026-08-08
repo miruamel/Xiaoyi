@@ -13,8 +13,8 @@
 //! @see crate::critic
 //! @see crate::critic::large_llm
 
-use crate::xiaoyi::critic::SmallLlmFinding;
 use crate::xiaoyi::core::error::Result;
+use crate::xiaoyi::critic::SmallLlmFinding;
 use crate::xiaoyi::llm::client::LlmClient;
 
 /// Small LLM critic for style checks.
@@ -62,7 +62,11 @@ impl StyleCritic {
         };
 
         let response = self.client.chat(request).await?;
-        let content = response.choices.first().map(|c| c.message.content.clone()).unwrap_or_default();
+        let content = response
+            .choices
+            .first()
+            .map(|c| c.message.content.clone())
+            .unwrap_or_default();
 
         // Parse JSON response (simplified)
         let findings: Vec<SmallLlmFinding> = serde_json::from_str(&content).unwrap_or_default();
@@ -109,7 +113,11 @@ impl DocCritic {
         };
 
         let response = self.client.chat(request).await?;
-        let content = response.choices.first().map(|c| c.message.content.clone()).unwrap_or_default();
+        let content = response
+            .choices
+            .first()
+            .map(|c| c.message.content.clone())
+            .unwrap_or_default();
 
         let findings: Vec<SmallLlmFinding> = serde_json::from_str(&content).unwrap_or_default();
         Ok(findings)
@@ -161,7 +169,11 @@ impl AccessibilityCritic {
         };
 
         let response = self.client.chat(request).await?;
-        let content = response.choices.first().map(|c| c.message.content.clone()).unwrap_or_default();
+        let content = response
+            .choices
+            .first()
+            .map(|c| c.message.content.clone())
+            .unwrap_or_default();
 
         let findings: Vec<SmallLlmFinding> = serde_json::from_str(&content).unwrap_or_default();
         Ok(findings)

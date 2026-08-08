@@ -12,7 +12,6 @@
 //! @see crate::resilience
 //! @complexity O(1) semaphore operations
 
-
 /// Bulkhead configuration.
 ///
 /// @brief Resource isolation settings

@@ -19,7 +19,7 @@ permissions:
   id-token: write
 
 env:
-  RUST_VERSION: '1.82'
+  RUST_VERSION: '1.99-nightly'
 
 jobs:
   # Validate version and prepare

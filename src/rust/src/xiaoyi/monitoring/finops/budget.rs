@@ -1,5 +1,5 @@
-use crate::xiaoyi::core::error::{XiaoyiError, ErrorKind};
 use crate::xiaoyi::core::error::Result;
+use crate::xiaoyi::core::error::{ErrorKind, XiaoyiError};
 use serde::{Deserialize, Serialize};
 
 /// Budget tracking structure for controlling spending limits.
@@ -68,7 +68,14 @@ impl Budget {
     /// @author Miruamel
     pub fn add_spent(&mut self, amount: f64) -> Result<()> {
         if self.would_exceed(amount) {
-            return Err(XiaoyiError::new(ErrorKind::Policy, format!("Budget exceeded: limit={}, spent={}", self.limit_usd, self.spent_usd + amount)));
+            return Err(XiaoyiError::new(
+                ErrorKind::Policy,
+                format!(
+                    "Budget exceeded: limit={}, spent={}",
+                    self.limit_usd,
+                    self.spent_usd + amount
+                ),
+            ));
         }
         self.spent_usd += amount;
         Ok(())

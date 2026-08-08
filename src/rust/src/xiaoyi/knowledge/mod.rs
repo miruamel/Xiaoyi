@@ -38,8 +38,8 @@ use crate::xiaoyi::knowledge::graph::repo::RepoScanner;
 use crate::xiaoyi::knowledge::retrieval::rag::{RetrievalPipeline, RetrievalResult};
 use crate::xiaoyi::knowledge::tools::openapi::OpenApiStore;
 use crate::xiaoyi::knowledge::tools::registry::{ToolPlugin, ToolRegistry};
-use crate::xiaoyi::knowledge::vector::{InMemoryVectorStore, LocalEmbeddingProvider};
 use crate::xiaoyi::knowledge::vector::store::VectorStore;
+use crate::xiaoyi::knowledge::vector::{InMemoryVectorStore, LocalEmbeddingProvider};
 use parking_lot::RwLock;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
@@ -342,7 +342,6 @@ impl KnowledgeBase {
         }
         Ok(scanned)
     }
-
 
     /// Borrow the active configuration.
     ///

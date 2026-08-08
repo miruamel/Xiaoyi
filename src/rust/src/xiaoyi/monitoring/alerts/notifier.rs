@@ -1,8 +1,8 @@
 use crate::xiaoyi::core::error::Result;
 use async_trait::async_trait;
 use parking_lot::RwLock;
-use std::sync::Arc;
 use std::collections::VecDeque;
+use std::sync::Arc;
 
 use super::{Alert, AlertRule};
 

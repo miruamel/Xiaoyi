@@ -19,5 +19,5 @@
 pub mod plugin;
 pub mod registry;
 
-pub use plugin::{ToolPlugin, ToolHandler};
+pub use plugin::{ToolHandler, ToolPlugin};
 pub use registry::ToolRegistry;

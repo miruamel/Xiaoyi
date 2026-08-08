@@ -16,8 +16,8 @@
 //! let store = OpenApiStore::default();
 //! store.load("my-tool", "{\"openapi\": \"3.0.0\", ...}")?;
 
-pub mod schema;
 pub mod openapi;
+pub mod schema;
 
-pub use schema::{Schema, SchemaKind, SchemaField};
 pub use openapi::OpenApiStore;
+pub use schema::{Schema, SchemaField, SchemaKind};

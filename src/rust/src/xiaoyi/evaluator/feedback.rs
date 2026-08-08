@@ -13,7 +13,7 @@
 //! @see crate::evaluator::gates
 //! @see crate::critic::aggregator
 
-use crate::xiaoyi::evaluator::{EvaluationResult, GateResult, AnalysisFinding};
+use crate::xiaoyi::evaluator::{AnalysisFinding, EvaluationResult, GateResult};
 
 /// Feedback configuration.
 ///
@@ -74,7 +74,11 @@ impl FeedbackFormulator {
         // Overall status
         feedback.push_str(&format!(
             "Evaluation {}: {}\n\n",
-            if result.gate_status.overall_pass { "PASSED" } else { "FAILED" },
+            if result.gate_status.overall_pass {
+                "PASSED"
+            } else {
+                "FAILED"
+            },
             if result.gate_status.overall_pass {
                 "All quality gates passed."
             } else {
@@ -174,13 +178,19 @@ impl FeedbackFormulator {
         if let Some(b) = &result.benchmark_results {
             feedback.push_str("## Performance\n\n");
             feedback.push_str(&format!("- Execution time: {}ms\n", b.execution_time_ms));
-            feedback.push_str(&format!("- Memory peak: {}MB\n", b.memory_peak_bytes / 1024 / 1024));
+            feedback.push_str(&format!(
+                "- Memory peak: {}MB\n",
+                b.memory_peak_bytes / 1024 / 1024
+            ));
             feedback.push_str(&format!("- CPU time: {}ms\n", b.cpu_time_ms));
             if b.estimated_cost_usd > 0.0 {
                 feedback.push_str(&format!("- Estimated cost: ${:.4}\n", b.estimated_cost_usd));
             }
             if let Some(t) = &b.token_usage {
-                feedback.push_str(&format!("- Tokens: {} total ({} prompt + {} completion)\n", t.total_tokens, t.prompt_tokens, t.completion_tokens));
+                feedback.push_str(&format!(
+                    "- Tokens: {} total ({} prompt + {} completion)\n",
+                    t.total_tokens, t.prompt_tokens, t.completion_tokens
+                ));
             }
             feedback.push('\n');
         }
@@ -222,7 +232,9 @@ impl FeedbackFormulator {
     /// @since 0.1.0
     pub fn retry_prompt(&self, result: &EvaluationResult) -> String {
         let mut prompt = String::new();
-        prompt.push_str("The previous attempt failed quality gates. Please fix the following issues:\n\n");
+        prompt.push_str(
+            "The previous attempt failed quality gates. Please fix the following issues:\n\n",
+        );
         prompt.push_str(&self.formulate(result));
         prompt.push_str("\n\nPlease provide corrected code that addresses all failures.");
         prompt

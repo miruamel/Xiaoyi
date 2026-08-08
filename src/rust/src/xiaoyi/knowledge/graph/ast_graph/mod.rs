@@ -5,10 +5,10 @@
 //! @author Miruamel
 //! @see crate::knowledge::graph
 
-pub mod node;
 pub mod edge;
 pub mod graph;
+pub mod node;
 
-pub use node::{AstNode, AstNodeKind};
 pub use edge::{AstEdge, AstEdgeKind};
 pub use graph::AstGraph;
+pub use node::{AstNode, AstNodeKind};

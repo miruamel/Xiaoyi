@@ -42,28 +42,29 @@ pub mod domain;
 pub mod evaluator;
 pub mod gateway;
 pub mod knowledge;
-pub mod monitoring;
 pub mod lexer;
 pub mod llm;
 pub mod memory;
+pub mod monitoring;
 pub mod orchestrator;
 pub mod resilience;
 pub mod workflow;
 
 // Knowledge re-exports
-pub use knowledge::{
-    EntryKind, KnowledgeBase, KnowledgeConfig, KnowledgeEntry, KnowledgeStats,
-};
+pub use knowledge::{EntryKind, KnowledgeBase, KnowledgeConfig, KnowledgeEntry, KnowledgeStats};
 
 // Monitoring re-exports
 pub use monitoring::{
-    Alert, AlertManager, AlertRule, AlertSeverity, Notifier, Budget, CostEstimate, CostTracker,
-    Counter, Gauge, Histogram, HistogramSnapshot, MetricRegistry, Span, SpanContext, SpanKind,
+    Alert, AlertManager, AlertRule, AlertSeverity, Budget, CostEstimate, CostTracker, Counter,
+    Gauge, Histogram, HistogramSnapshot, MetricRegistry, Notifier, Span, SpanContext, SpanKind,
     TraceExporter, Tracer,
 };
 
 // Re-exports for public API
 pub use core::config::{Config, ConfigBuilder};
-pub use core::error::{ErrorKind, XiaoyiError, Result};
+pub use core::error::{ErrorKind, Result, XiaoyiError};
 pub use core::result::Status;
-pub use evaluator::{Evaluator, EvaluationResult, SandboxResult, BuildResult, TestResult, TestType, AnalysisFinding, Severity, BenchmarkResult, TokenUsage, GateStatus, GateResult};
+pub use evaluator::{
+    AnalysisFinding, BenchmarkResult, BuildResult, EvaluationResult, Evaluator, GateResult,
+    GateStatus, SandboxResult, Severity, TestResult, TestType, TokenUsage,
+};

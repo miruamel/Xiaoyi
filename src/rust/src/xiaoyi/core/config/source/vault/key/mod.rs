@@ -38,8 +38,8 @@
 //!   - Use hardware security module (HSM) in production.
 //!   - Rotate keys periodically; re-encrypt vault on rotation.
 //!   - Never commit keys to version control.
-use base64::{engine::general_purpose, Engine as _};
 use crate::xiaoyi::core::error::{ErrorKind, Result, XiaoyiError};
+use base64::{Engine as _, engine::general_purpose};
 
 /// Load encryption key from environment.
 ///

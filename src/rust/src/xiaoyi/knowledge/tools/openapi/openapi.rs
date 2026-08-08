@@ -17,12 +17,11 @@
 //! store.load("my-tool", "{\"openapi\": \"3.0.0\", \"info\": {\"title\": \"...\"}}")?;
 //! let names = store.names();
 
-
 use indexmap::IndexMap;
 use parking_lot::RwLock;
 
-use serde_json;
 use crate::xiaoyi::core::error::Result;
+use serde_json;
 
 /// A store for OpenAPI specifications that enables tool discovery and introspection.
 ///

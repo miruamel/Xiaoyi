@@ -4,8 +4,8 @@
 //! @since 0.1.0
 //! @author Miruamel
 
-use async_trait::async_trait;
 use crate::xiaoyi::core::error::Result;
+use async_trait::async_trait;
 
 pub mod in_memory;
 
@@ -16,7 +16,11 @@ pub trait VectorStore: Send + Sync {
     async fn upsert(&self, id: String, vector: Vec<f32>, payload: Vec<u8>) -> Result<()>;
 
     /// Queries stored vectors by similarity to the query vector, returning top_k matches.
-    async fn query(&self, vector: Vec<f32>, top_k: usize) -> Result<Vec<crate::xiaoyi::knowledge::vector::index::SearchResult>>;
+    async fn query(
+        &self,
+        vector: Vec<f32>,
+        top_k: usize,
+    ) -> Result<Vec<crate::xiaoyi::knowledge::vector::index::SearchResult>>;
 
     /// Deletes a vector embedding by its identifier.
     async fn delete(&self, id: &str) -> Result<()>;

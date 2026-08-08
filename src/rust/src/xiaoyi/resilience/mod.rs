@@ -41,7 +41,6 @@ pub mod health;
 pub mod retry;
 pub mod timeout;
 
-
 /// Resilience pipeline for fault-tolerant execution.
 ///
 /// @brief Combines resilience patterns for robust execution
@@ -96,8 +95,8 @@ impl ResiliencePipeline {
     /// @example
     /// ```rust
     /// let result = pipeline.execute(|| async {
-///     Ok("success".to_string())
-/// }).await?;
+    ///     Ok("success".to_string())
+    /// }).await?;
     /// ```
     /// @since 0.1.0
     /// @security Limits resource exhaustion via bulkhead
@@ -116,7 +115,10 @@ impl ResiliencePipeline {
     /// @param operation Operation to execute
     /// @return Result of operation
     /// @since 0.1.0
-    pub async fn execute_with_circuit<F, Fut, T, E>(&self, operation: F) -> std::result::Result<T, E>
+    pub async fn execute_with_circuit<F, Fut, T, E>(
+        &self,
+        operation: F,
+    ) -> std::result::Result<T, E>
     where
         F: Fn() -> Fut,
         Fut: std::future::Future<Output = std::result::Result<T, E>>,

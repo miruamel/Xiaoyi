@@ -16,7 +16,9 @@ pub struct FlatIndex {
 impl FlatIndex {
     /// Creates a new empty flat index.
     pub fn new() -> Self {
-        Self { data: RwLock::new(Vec::new()) }
+        Self {
+            data: RwLock::new(Vec::new()),
+        }
     }
 
     /// Inserts a vector embedding with associated payload into the index.
@@ -52,8 +54,16 @@ impl FlatIndex {
             });
         }
 
-        results.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal));
-        let results = if results.len() > top_k { results[..top_k].to_vec() } else { results };
+        results.sort_by(|a, b| {
+            b.score
+                .partial_cmp(&a.score)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
+        let results = if results.len() > top_k {
+            results[..top_k].to_vec()
+        } else {
+            results
+        };
 
         results
     }

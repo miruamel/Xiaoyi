@@ -18,7 +18,6 @@
 //! registry.register(plugin)?;
 //! let result = registry.invoke("my-tool", input)?;
 
-
 use indexmap::IndexMap;
 use parking_lot::RwLock;
 
@@ -115,16 +114,15 @@ impl ToolRegistry {
     /// Returns `XiaoyiError` with kind `ErrorKind::Tool` if:
     /// - The plugin with the given name does not exist.
     /// - The plugin's handler returns an error.
-    pub fn invoke(&self, name: &str, input: serde_json::Value) -> Result<serde_json::Value, XiaoyiError> {
+    pub fn invoke(
+        &self,
+        name: &str,
+        input: serde_json::Value,
+    ) -> Result<serde_json::Value, XiaoyiError> {
         let map = self.tools.read();
-        let plugin = map
-            .get(name)
-            .ok_or_else(|| {
-                XiaoyiError::new(
-                    ErrorKind::Tool,
-                    format!("Tool plugin '{}' not found", name),
-                )
-            })?;
+        let plugin = map.get(name).ok_or_else(|| {
+            XiaoyiError::new(ErrorKind::Tool, format!("Tool plugin '{}' not found", name))
+        })?;
         plugin.invoke(input)
     }
 }

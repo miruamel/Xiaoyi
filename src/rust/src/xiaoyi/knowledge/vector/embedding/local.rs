@@ -4,11 +4,11 @@
 //! @since 0.1.0
 //! @author Miruamel
 
-use crate::xiaoyi::knowledge::vector::embedding::EmbeddingProvider;
 use crate::xiaoyi::core::error::Result;
+use crate::xiaoyi::knowledge::vector::embedding::EmbeddingProvider;
+use async_trait::async_trait;
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
-use async_trait::async_trait;
 
 /// Local embedding provider with fixed dimensionality and deterministic hashing.
 #[derive(Debug, Clone)]

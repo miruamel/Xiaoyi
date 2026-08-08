@@ -14,14 +14,14 @@
 //! @see crate::xiaoyi::memory::stm::cache
 //! @see crate::xiaoyi::workflow::dag::graph
 
-use pyo3::exceptions::{PyRuntimeError, PyValueError};
-use pyo3::prelude::*;
-use pyo3::types::{PyAny, PyDict};
-use pyo3::Bound;
-use std::fmt;
 use crate::xiaoyi::core::config::source::ConfigSource;
 use crate::xiaoyi::core::config::source::vault::VaultSource;
 use crate::xiaoyi::workflow::dag::graph::NodeId;
+use pyo3::Bound;
+use pyo3::exceptions::{PyRuntimeError, PyValueError};
+use pyo3::prelude::*;
+use pyo3::types::{PyAny, PyDict};
+use std::fmt;
 
 /// Convert serde_json::Value to Python object.
 fn json_value_to_pyobject<'py>(
@@ -47,7 +47,10 @@ fn json_value_to_pyobject<'py>(
         }
         serde_json::Value::String(s) => Ok(s.into_pyobject(py)?.into_any()),
         serde_json::Value::Array(arr) => {
-            let list = pyo3::types::PyList::new(py, arr.iter().map(|v| json_value_to_pyobject(py, v).unwrap()))?;
+            let list = pyo3::types::PyList::new(
+                py,
+                arr.iter().map(|v| json_value_to_pyobject(py, v).unwrap()),
+            )?;
             Ok(list.into_any())
         }
         serde_json::Value::Object(obj) => {
@@ -221,7 +224,7 @@ impl PyXiaoyiError {
         let dict = PyDict::new(py);
         for (k, v) in &self.inner.meta {
             dict.set_item(k.as_str(), v.as_str())?;
-            }
+        }
         Ok(dict.into_any())
     }
 
@@ -475,7 +478,7 @@ impl PyConfig {
         let dict = PyDict::new(py);
         for (k, v) in self.inner.iter() {
             dict.set_item(k.as_str(), json_value_to_pyobject(py, v)?)?;
-            }
+        }
         Ok(dict.into_any())
     }
 }
@@ -651,10 +654,11 @@ impl PyFileSource {
     /// @throw PyValueError if required file not found.
     /// @since 0.1.0
     pub fn load<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
-        let rt = tokio::runtime::Runtime::new()
-            .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        let rt =
+            tokio::runtime::Runtime::new().map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
         let result = rt.block_on(async {
-            let source = crate::xiaoyi::core::config::source::file::FileSource::new(self.path.clone());
+            let source =
+                crate::xiaoyi::core::config::source::file::FileSource::new(self.path.clone());
             let source = if self.required {
                 source
             } else {
@@ -667,7 +671,7 @@ impl PyFileSource {
                 let dict = PyDict::new(py);
                 for (k, v) in data {
                     dict.set_item(k.as_str(), json_value_to_pyobject(py, &v)?)?;
-                    }
+                }
                 Ok(dict.into_any())
             }
             Err(e) => Err(PyValueError::new_err(e.to_string())),
@@ -721,8 +725,8 @@ impl PyEnvSource {
     /// @throw PyValueError if load fails.
     /// @since 0.1.0
     pub fn load<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
-        let rt = tokio::runtime::Runtime::new()
-            .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        let rt =
+            tokio::runtime::Runtime::new().map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
         let result = rt.block_on(async {
             let source = crate::xiaoyi::core::config::source::env::EnvSource::new();
             source.load()
@@ -732,7 +736,7 @@ impl PyEnvSource {
                 let dict = PyDict::new(py);
                 for (k, v) in data {
                     dict.set_item(k.as_str(), json_value_to_pyobject(py, &v)?)?;
-                    }
+                }
                 Ok(dict.into_any())
             }
             Err(e) => Err(PyValueError::new_err(e.to_string())),
@@ -794,10 +798,11 @@ impl PyVaultSource {
     /// @throw PyValueError if decryption fails.
     /// @since 0.1.0
     pub fn load<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
-        let rt = tokio::runtime::Runtime::new()
-            .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        let rt =
+            tokio::runtime::Runtime::new().map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
         let result = rt.block_on(async {
-            let source = crate::xiaoyi::core::config::source::vault::VaultSource::new(self.path.clone());
+            let source =
+                crate::xiaoyi::core::config::source::vault::VaultSource::new(self.path.clone());
             let source = if self.required {
                 source
             } else {
@@ -810,7 +815,7 @@ impl PyVaultSource {
                 let dict = PyDict::new(py);
                 for (k, v) in data {
                     dict.set_item(k.as_str(), json_value_to_pyobject(py, &v)?)?;
-                    }
+                }
                 Ok(dict.into_any())
             }
             Err(e) => Err(PyValueError::new_err(e.to_string())),
@@ -827,9 +832,10 @@ impl PyVaultSource {
 /// @security Uses AES-256-GCM with random nonce.
 #[pyfunction]
 pub fn encrypt_vault(plaintext: Vec<u8>, key: Vec<u8>) -> PyResult<Vec<u8>> {
-    let key_arr: [u8; 32] = key.as_slice().try_into().map_err(|_| {
-        PyValueError::new_err("Key must be exactly 32 bytes")
-    })?;
+    let key_arr: [u8; 32] = key
+        .as_slice()
+        .try_into()
+        .map_err(|_| PyValueError::new_err("Key must be exactly 32 bytes"))?;
     crate::xiaoyi::core::config::source::vault::encrypt(plaintext.as_slice(), &key_arr)
         .map_err(|e| PyValueError::new_err(e.to_string()))
 }
@@ -843,9 +849,10 @@ pub fn encrypt_vault(plaintext: Vec<u8>, key: Vec<u8>) -> PyResult<Vec<u8>> {
 /// @security Validates GCM authentication tag.
 #[pyfunction]
 pub fn decrypt_vault(ciphertext: Vec<u8>, key: Vec<u8>) -> PyResult<Vec<u8>> {
-    let key_arr: [u8; 32] = key.as_slice().try_into().map_err(|_| {
-        PyValueError::new_err("Key must be exactly 32 bytes")
-    })?;
+    let key_arr: [u8; 32] = key
+        .as_slice()
+        .try_into()
+        .map_err(|_| PyValueError::new_err("Key must be exactly 32 bytes"))?;
     crate::xiaoyi::core::config::source::vault::decrypt(ciphertext.as_slice(), &key_arr)
         .map_err(|e| PyValueError::new_err(e.to_string()))
 }
@@ -989,7 +996,6 @@ impl PyFloatKind {
 
     #[getter]
     pub fn bits(&self) -> u8 {
-
         match self {
             PyFloatKind::F32 => 32,
             PyFloatKind::F64 => 64,
@@ -1147,13 +1153,27 @@ impl PyOperator {
     #[getter]
     pub fn kind(&self) -> PyOperatorKind {
         match self.inner.kind {
-            crate::xiaoyi::domain::token::syntax::operator::OperatorKind::Arithmetic => PyOperatorKind::Arithmetic,
-            crate::xiaoyi::domain::token::syntax::operator::OperatorKind::Comparison => PyOperatorKind::Comparison,
-            crate::xiaoyi::domain::token::syntax::operator::OperatorKind::Logical => PyOperatorKind::Logical,
-            crate::xiaoyi::domain::token::syntax::operator::OperatorKind::Bitwise => PyOperatorKind::Bitwise,
-            crate::xiaoyi::domain::token::syntax::operator::OperatorKind::Assignment => PyOperatorKind::Assignment,
-            crate::xiaoyi::domain::token::syntax::operator::OperatorKind::MemberAccess => PyOperatorKind::MemberAccess,
-            crate::xiaoyi::domain::token::syntax::operator::OperatorKind::CallIndex => PyOperatorKind::CallIndex,
+            crate::xiaoyi::domain::token::syntax::operator::OperatorKind::Arithmetic => {
+                PyOperatorKind::Arithmetic
+            }
+            crate::xiaoyi::domain::token::syntax::operator::OperatorKind::Comparison => {
+                PyOperatorKind::Comparison
+            }
+            crate::xiaoyi::domain::token::syntax::operator::OperatorKind::Logical => {
+                PyOperatorKind::Logical
+            }
+            crate::xiaoyi::domain::token::syntax::operator::OperatorKind::Bitwise => {
+                PyOperatorKind::Bitwise
+            }
+            crate::xiaoyi::domain::token::syntax::operator::OperatorKind::Assignment => {
+                PyOperatorKind::Assignment
+            }
+            crate::xiaoyi::domain::token::syntax::operator::OperatorKind::MemberAccess => {
+                PyOperatorKind::MemberAccess
+            }
+            crate::xiaoyi::domain::token::syntax::operator::OperatorKind::CallIndex => {
+                PyOperatorKind::CallIndex
+            }
         }
     }
 
@@ -1171,16 +1191,25 @@ impl PyOperator {
     #[getter]
     pub fn associativity(&self) -> PyAssociativity {
         match self.inner.associativity {
-            crate::xiaoyi::domain::token::syntax::operator::Associativity::Left => PyAssociativity::Left,
-            crate::xiaoyi::domain::token::syntax::operator::Associativity::Right => PyAssociativity::Right,
-            crate::xiaoyi::domain::token::syntax::operator::Associativity::None => PyAssociativity::None,
+            crate::xiaoyi::domain::token::syntax::operator::Associativity::Left => {
+                PyAssociativity::Left
+            }
+            crate::xiaoyi::domain::token::syntax::operator::Associativity::Right => {
+                PyAssociativity::Right
+            }
+            crate::xiaoyi::domain::token::syntax::operator::Associativity::None => {
+                PyAssociativity::None
+            }
         }
     }
 
     fn __repr__(&self) -> String {
         format!(
             "Operator(symbol='{}', kind={}, precedence={}, associativity={:?})",
-            self.inner.symbol, self.kind(), self.inner.precedence, self.inner.associativity
+            self.inner.symbol,
+            self.kind(),
+            self.inner.precedence,
+            self.inner.associativity
         )
     }
 }
@@ -1226,7 +1255,11 @@ pub fn all_operators() -> Vec<PyOperator> {
 /// @return Parsed value or None for empty string.
 /// @since 0.1.0
 #[pyfunction]
-pub fn parse_literal<'py>(_raw: &str, _kind: PySyntaxKind, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+pub fn parse_literal<'py>(
+    _raw: &str,
+    _kind: PySyntaxKind,
+    py: Python<'py>,
+) -> PyResult<Bound<'py, PyAny>> {
     // Use Python's own parsing for primitives - Rust core may not expose parse_literal
     Ok(py.None().into_bound(py).into_any())
 }
@@ -1381,7 +1414,9 @@ impl PyDagNode {
     /// @since 0.1.0
     #[getter]
     pub fn id(&self) -> PyNodeId {
-        PyNodeId { inner: self.inner.id.clone() }
+        PyNodeId {
+            inner: self.inner.id.clone(),
+        }
     }
 
     /// @brief Get the node label.
@@ -1423,7 +1458,9 @@ impl PyDagEdge {
             PyEdgeKind::Conditional => crate::xiaoyi::workflow::dag::graph::EdgeKind::Conditional,
         };
         Self {
-            inner: crate::xiaoyi::workflow::dag::graph::DagEdge::new(from.inner, to.inner, edge_kind),
+            inner: crate::xiaoyi::workflow::dag::graph::DagEdge::new(
+                from.inner, to.inner, edge_kind,
+            ),
         }
     }
 }
@@ -1458,7 +1495,10 @@ impl PyDagGraph {
     /// @since 0.1.0
     pub fn add_node(&mut self, node: PyDagNode) -> PyNodeId {
         let idx = self.inner.add_node(node.inner);
-        let node_id = self.inner.node_id(idx).unwrap_or_else(|| NodeId::new("unknown"));
+        let node_id = self
+            .inner
+            .node_id(idx)
+            .unwrap_or_else(|| NodeId::new("unknown"));
         PyNodeId { inner: node_id }
     }
 
@@ -1467,9 +1507,9 @@ impl PyDagGraph {
     /// @throw PyValueError if edge references non-existent nodes or creates a cycle.
     /// @since 0.1.0
     pub fn add_edge(&mut self, edge: PyDagEdge) -> PyResult<()> {
-        self.inner.add_edge(edge.inner).map_err(|e| {
-            PyValueError::new_err(format!("DAG error: {}", e))
-        })
+        self.inner
+            .add_edge(edge.inner)
+            .map_err(|e| PyValueError::new_err(format!("DAG error: {}", e)))
     }
 
     /// @brief Get topological ordering of nodes.
@@ -1477,7 +1517,8 @@ impl PyDagGraph {
     /// @throw PyRuntimeError if a cycle is detected.
     /// @since 0.1.0
     pub fn topological_order(&self) -> PyResult<Vec<PyNodeId>> {
-        self.inner.topological_order()
+        self.inner
+            .topological_order()
             .map(|ids| ids.into_iter().map(|id| PyNodeId { inner: id }).collect())
             .map_err(|e| PyRuntimeError::new_err(format!("Topological sort failed: {}", e)))
     }
@@ -1604,7 +1645,9 @@ impl PyCacheStats {
 #[pyclass(from_py_object)]
 #[derive(Clone)]
 pub struct PyLruCache {
-    pub(crate) inner: std::sync::Arc<tokio::sync::RwLock<crate::xiaoyi::memory::stm::cache::LruCache<String, String>>>,
+    pub(crate) inner: std::sync::Arc<
+        tokio::sync::RwLock<crate::xiaoyi::memory::stm::cache::LruCache<String, String>>,
+    >,
 }
 
 #[pymethods]
@@ -1617,7 +1660,7 @@ impl PyLruCache {
     pub fn new(capacity: usize) -> Self {
         Self {
             inner: std::sync::Arc::new(tokio::sync::RwLock::new(
-                crate::xiaoyi::memory::stm::cache::LruCache::new(capacity)
+                crate::xiaoyi::memory::stm::cache::LruCache::new(capacity),
             )),
         }
     }
@@ -1629,8 +1672,8 @@ impl PyLruCache {
     /// @throw PyRuntimeError if runtime creation fails.
     /// @since 0.1.0
     pub fn insert(&self, key: String, value: String, ttl: Option<u64>) -> PyResult<()> {
-        let rt = tokio::runtime::Runtime::new()
-            .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        let rt =
+            tokio::runtime::Runtime::new().map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
         rt.block_on(async {
             let duration = ttl.map(std::time::Duration::from_secs);
             self.inner.write().await.insert(key, value, duration);
@@ -1643,32 +1686,28 @@ impl PyLruCache {
     /// @return The value if present and not expired, None otherwise.
     /// @since 0.1.0
     pub fn get(&self, key: &str) -> PyResult<Option<String>> {
-        let rt = tokio::runtime::Runtime::new()
-            .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        let rt =
+            tokio::runtime::Runtime::new().map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
         let key = key.to_string();
-        rt.block_on(async {
-            Ok(self.inner.read().await.get(&key))
-        })
-        .map_err(|e: tokio::task::JoinError| PyRuntimeError::new_err(e.to_string()))
+        rt.block_on(async { Ok(self.inner.read().await.get(&key)) })
+            .map_err(|e: tokio::task::JoinError| PyRuntimeError::new_err(e.to_string()))
     }
     /// @brief Remove a key from the cache.
     /// @param key The cache key.
     /// @return true if key was present.
     pub fn remove(&self, key: &str) -> PyResult<bool> {
-        let rt = tokio::runtime::Runtime::new()
-            .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        let rt =
+            tokio::runtime::Runtime::new().map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
         let key = key.to_string();
-        rt.block_on(async {
-            Ok(self.inner.write().await.remove(&key))
-        })
-        .map_err(|e: tokio::task::JoinError| PyRuntimeError::new_err(e.to_string()))
+        rt.block_on(async { Ok(self.inner.write().await.remove(&key)) })
+            .map_err(|e: tokio::task::JoinError| PyRuntimeError::new_err(e.to_string()))
     }
     /// @since 0.1.0
     /// @brief Clear all entries from the cache.
     /// @since 0.1.0
     pub fn clear(&self) -> PyResult<()> {
-        let rt = tokio::runtime::Runtime::new()
-            .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        let rt =
+            tokio::runtime::Runtime::new().map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
         rt.block_on(async {
             self.inner.write().await.clear();
         });

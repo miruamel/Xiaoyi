@@ -8,6 +8,6 @@ pub mod embedding;
 pub mod index;
 pub mod store;
 
-pub use store::{VectorStore, InMemoryVectorStore};
 pub use embedding::{EmbeddingProvider, LocalEmbeddingProvider};
-pub use index::{SearchResult, FlatIndex};
+pub use index::{FlatIndex, SearchResult};
+pub use store::{InMemoryVectorStore, VectorStore};

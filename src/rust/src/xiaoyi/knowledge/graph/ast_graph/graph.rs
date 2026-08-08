@@ -5,13 +5,13 @@
 //! @author Miruamel
 //! @see crate::knowledge::graph::ast_graph
 
-use petgraph::graph::{NodeIndex, Graph};
 use petgraph::algo::is_cyclic_directed;
+use petgraph::graph::{Graph, NodeIndex};
 use std::collections::HashMap;
 
-use crate::xiaoyi::core::error::{Result, XiaoyiError, ErrorKind};
+use crate::xiaoyi::core::error::{ErrorKind, Result, XiaoyiError};
 
-use super::{AstNode, AstEdge, AstEdgeKind};
+use super::{AstEdge, AstEdgeKind, AstNode};
 
 /// Directed graph over abstract syntax tree nodes.
 #[derive(Debug, Clone, Default)]
@@ -63,7 +63,9 @@ impl AstGraph {
 
     /// Look up a node by its ID.
     pub fn node(&self, id: u64) -> Option<&AstNode> {
-        self.ids.get(&id).and_then(|idx| self.inner.node_weight(*idx))
+        self.ids
+            .get(&id)
+            .and_then(|idx| self.inner.node_weight(*idx))
     }
 
     /// Return references to all nodes in the graph.
@@ -130,9 +132,9 @@ impl AstGraph {
     fn edge_kind(&self, from_id: u64, to_id: u64) -> Option<AstEdgeKind> {
         let from_idx = self.ids.get(&from_id)?;
         let to_idx = self.ids.get(&to_id)?;
-        self.inner.find_edge(*from_idx, *to_idx).and_then(|edge_idx| {
-            self.inner.edge_weight(edge_idx).cloned()
-        })
+        self.inner
+            .find_edge(*from_idx, *to_idx)
+            .and_then(|edge_idx| self.inner.edge_weight(edge_idx).cloned())
     }
 
     /// Helper: get NodeIndex for a node ID.
