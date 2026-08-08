@@ -38,6 +38,10 @@ pub use xiaoyi::core::config::source::vault::VaultSource;
 pub use xiaoyi::core::error::{ErrorKind, XiaoyiError, Result};
 pub use xiaoyi::core::result::Status;
 pub use xiaoyi::critic::{CriticPlant, ReviewResult, Severity};
+pub use xiaoyi::evaluator::{
+    SandboxResult, BuildResult, TestResult, TestType, AnalysisFinding, Severity,
+    BenchmarkResult, TokenUsage, GateResult, GateStatus, EvaluationResult, Evaluator,
+};
 pub use xiaoyi::lexer::Lexer;
 pub use xiaoyi::llm::client::{ChatMessage, ChatRequest, ChatResponse, ChatChoice, Usage, LlmClient, MessageRole};
 pub use xiaoyi::memory::stm::cache::LruCache;
