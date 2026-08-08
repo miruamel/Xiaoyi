@@ -69,7 +69,10 @@ pub use xiaoyi::resilience::circuit_breaker::CircuitBreaker;
 pub use xiaoyi::resilience::retry::RetryPolicy;
 pub use xiaoyi::resilience::{CircuitBreakerConfig, RetryConfig};
 // Utils re-exports
-pub use xiaoyi::utils::{format_duration, generate_id, slugify, truncate};
+pub use xiaoyi::utils::{
+    format_duration, from_json, generate_id, get_string_field, is_json_object, is_non_empty_string,
+    is_semver, is_url, now_millis, slugify, to_json, truncate,
+};
 // Module trees used by integration tests
 pub use xiaoyi::gateway;
 pub use xiaoyi::llm;

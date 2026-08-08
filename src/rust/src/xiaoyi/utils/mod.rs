@@ -15,9 +15,15 @@
 //! @author Miruamel
 //! @see crate::xiaoyi::core
 pub mod id;
+pub mod json;
+pub mod retry;
 pub mod string;
 pub mod time;
+pub mod validation;
 
 pub use id::generate_id;
+pub use json::{from_json, get_string_field, is_json_object, to_json};
+pub use retry::RetryConfig;
 pub use string::{slugify, truncate};
 pub use time::{format_duration, now_millis};
+pub use validation::{is_non_empty_string, is_semver, is_url};
