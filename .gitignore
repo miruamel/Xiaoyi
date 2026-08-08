@@ -50,3 +50,5 @@ website/build/
 
 # Rust doc build output
 target/doc/
+# Stray linked-library artifacts
+*.rlib

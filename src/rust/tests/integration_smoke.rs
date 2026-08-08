@@ -12,12 +12,12 @@
 //! @see crate::builder
 
 use pretty_assertions::assert_eq;
-use tempfile;
 use xiaoyi::llm::client::{ChatMessage, ChatRequest, MessageRole};
-use xiaoyi::workflow::dag::graph::{EdgeKind, NodeId, NodeKind};
+use xiaoyi::{EdgeKind, NodeId, NodeKind};
 use xiaoyi::{AgentBuilder, Gateway, Lexer, Orchestrator};
-use xiaoyi::{AsyncConfigSource, DagEdge, DagGraph, DagNode, FileSource, LruCache};
+use xiaoyi::{DagEdge, DagGraph, DagNode, FileSource, LruCache};
 use xiaoyi::{Config, ConfigBuilder, ErrorKind, Result, ResultExt, Status, XiaoyiError};
+use xiaoyi::ConfigSource;
 
 #[test]
 fn test_config_to_orchestrator_to_builder() {
@@ -105,7 +105,7 @@ fn test_config_with_file_source() {
     .unwrap();
 
     let source = FileSource::new(file_path.to_str().unwrap());
-    let data = tokio_test::block_on(source.load()).unwrap();
+    let data = source.load().unwrap();
 
     let name: String = data
         .get("agent.name")

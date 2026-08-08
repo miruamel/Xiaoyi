@@ -18,6 +18,10 @@
 //! @author Miruamel
 //! @see <https://github.com/miruamel/Xiaoyi>
 
+// WIP vertical architecture: many layer config/state fields are stored for future
+// wiring and are intentionally unused until higher layers (orchestrator loop,
+// monitoring) are completed. Allow dead_code to keep the crate warning-free.
+#![allow(dead_code)]
 // Public modules
 pub mod xiaoyi;
 
@@ -39,13 +43,30 @@ pub use xiaoyi::core::error::{ErrorKind, XiaoyiError, Result};
 pub use xiaoyi::core::result::Status;
 pub use xiaoyi::critic::{CriticPlant, ReviewResult, Severity};
 pub use xiaoyi::evaluator::{
-    SandboxResult, BuildResult, TestResult, TestType, AnalysisFinding, Severity,
+    SandboxResult, BuildResult, TestResult, TestType, AnalysisFinding,
     BenchmarkResult, TokenUsage, GateResult, GateStatus, EvaluationResult, Evaluator,
 };
 pub use xiaoyi::lexer::Lexer;
+pub use xiaoyi::lexer;
+pub use xiaoyi::domain::token::SyntaxKind;
 pub use xiaoyi::llm::client::{ChatMessage, ChatRequest, ChatResponse, ChatChoice, Usage, LlmClient, MessageRole};
 pub use xiaoyi::memory::stm::cache::LruCache;
 pub use xiaoyi::orchestrator::Orchestrator;
+pub use xiaoyi::knowledge::{
+    EntryKind, KnowledgeBase, KnowledgeConfig, KnowledgeEntry, KnowledgeStats,
+};
+// Module trees used by integration tests
+pub use xiaoyi::workflow;
+pub use xiaoyi::llm;
+pub use xiaoyi::gateway;
+pub use xiaoyi::memory;
+// Additional public types
+pub use xiaoyi::core::result::ResultExt;
+pub use xiaoyi::memory::stm::cache::CacheStats;
+pub use xiaoyi::gateway::Gateway;
+pub use xiaoyi::domain::token::primitive::PrimitiveKind;
+pub use xiaoyi::domain::token::primitive::float::FloatKind;
+pub use xiaoyi::domain::token::primitive::int::{IntType, IntKind, IntWidth};
 pub use xiaoyi::workflow::dag::{Dag, DagEdge, DagGraph, DagNode, NodeKind, EdgeKind, NodeId};
 /// Initialize the runtime.
 ///

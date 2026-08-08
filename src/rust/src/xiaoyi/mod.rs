@@ -41,12 +41,17 @@ pub mod critic;
 pub mod domain;
 pub mod evaluator;
 pub mod gateway;
+pub mod knowledge;
 pub mod lexer;
 pub mod llm;
 pub mod memory;
 pub mod orchestrator;
-pub mod resilience;
 pub mod workflow;
+
+// Knowledge re-exports
+pub use knowledge::{
+    EntryKind, KnowledgeBase, KnowledgeConfig, KnowledgeEntry, KnowledgeStats,
+};
 
 // Re-exports for public API
 pub use core::config::{Config, ConfigBuilder};
