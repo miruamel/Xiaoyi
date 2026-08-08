@@ -95,24 +95,94 @@ orchestrator/                # Layer 1: Orchestration domain
 critic/                      # Layer 1: Review domain
   aggregator/                # Layer 2: Meta-critic aggregation
   cache/                     # Layer 2: Semantic cache
+    embedding/               # Layer 3: Embedding helper
   large_llm/                 # Layer 2: Large LLM critics
   model_router/              # Layer 2: Model routing
   rules/                     # Layer 2: Fast-path rules
+    security/                # Layer 3: Security rules
+    style/                   # Layer 3: Style rules
   small_llm/                 # Layer 2: Small LLM critics
 
 evaluator/                   # Layer 1: Evaluation domain
   analysis/                  # Layer 2: Static analysis
   benchmark/                 # Layer 2: Benchmarks
   build/                     # Layer 2: Build checks
+    compiler/                # Layer 3: Compiler config
   feedback/                  # Layer 2: Feedback formulation
   gates/                     # Layer 2: Quality gates
   sandbox/                   # Layer 2: Sandbox execution
+    container/               # Layer 3: Container config
   test/                      # Layer 2: Test runners
+    property/                # Layer 3: Property test config
 
 gateway/                     # Layer 1: Gateway domain
+  api/                       # Layer 2: REST/GraphQL API
+  cli/                       # Layer 2: Command-line interface
+  middleware/                # Layer 2: Middleware
+    auth/                    # Layer 3: Authentication
+    ratelimit/               # Layer 3: Rate limiting
+  route/                     # Layer 2: Routing
+  web/                       # Layer 2: Web UI server
+
 knowledge/                   # Layer 1: Knowledge domain
+  graph/                     # Layer 2: Knowledge graph
+    repo/                    # Layer 3: Git-native repo
+      commit/                # Layer 4: Commit snapshots
+      scanner/               # Layer 4: Repo scanner
+  retrieval/                 # Layer 2: Retrieval
+    ranker/                  # Layer 3: Result ranking
+  tools/                     # Layer 2: Tool registry
+    openapi/                 # Layer 3: OpenAPI schema
+      schema/                # Layer 4: Schema parsing
+      schema_store/          # Layer 4: Schema storage
+    registry/                # Layer 3: Plugin registry
+      discovery/             # Layer 4: Tool discovery
+  vector/                    # Layer 2: Vector store
+    store/                   # Layer 3: Storage backend
+      in_memory/             # Layer 4: In-memory store
+      remote/                # Layer 4: Remote store
+
+llm/                         # Layer 1: LLM abstraction
+  client/                    # Layer 2: Client contract
+    anthropic/               # Layer 3: Anthropic provider
+    ollama/                  # Layer 3: Ollama provider
+    openai/                  # Layer 3: OpenAI provider
+    retry/                   # Layer 3: Retry policy
+  prompt/                    # Layer 2: Prompt utilities
+    template/                # Layer 3: Prompt templating
+
 monitoring/                  # Layer 1: Monitoring domain
+  alerts/                    # Layer 2: Alerting
+    alert/                   # Layer 3: Alert model
+    channel/                 # Layer 3: Delivery channel
+    notifier/                # Layer 3: Notifier impl
+    rule/                    # Layer 3: Rule engine
+  finops/                    # Layer 2: Cost tracking
+    budget/                  # Layer 3: Budget model
+    cost/                    # Layer 3: Cost estimate
+    tracker/                 # Layer 3: Cost tracker
+  metrics/                   # Layer 2: Metrics
+    counter/                 # Layer 3: Counter metric
+    gauge/                   # Layer 3: Gauge metric
+    histogram/               # Layer 3: Histogram metric
+    registry/                # Layer 3: Metric registry
+  tracing/                   # Layer 2: Distributed tracing
+    context/                 # Layer 3: Trace context
+    exporter/                # Layer 3: Span exporters
+      jaeger/                # Layer 4: Jaeger backend
+      otlp/                  # Layer 4: OTLP backend
+    sampler/                 # Layer 3: Sampling strategy
+    span/                    # Layer 3: Span model
+
 resilience/                  # Layer 1: Resilience domain
+  bulkhead/                  # Layer 2: Bulkhead isolation
+  circuit_breaker/           # Layer 2: Circuit breaker
+  fallback/                  # Layer 2: Fallback routing
+  health/                    # Layer 2: Health checks
+  retry/                     # Layer 2: Retry/backoff
+  timeout/                   # Layer 2: Timeout handling
+  semaphore/                 # Layer 2: Concurrency limiter
+  isolation/                 # Layer 2: Failure isolation
 ```
 
 ## Consequences
