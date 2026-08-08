@@ -14,6 +14,8 @@
 //! @since 0.1.0
 //! @author Miruamel
 //! @see crate::xiaoyi::core
+pub mod crypto;
+pub mod encoding;
 pub mod env;
 pub mod fs;
 pub mod id;

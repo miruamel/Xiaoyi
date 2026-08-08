@@ -17,6 +17,7 @@
 //! @see crate::workflow
 //! @see crate::workflow::dag::graph
 pub mod graph;
+pub mod scheduler;
 
 // Re-exports from graph
 pub use graph::{DagEdge, DagGraph as Dag, DagGraph, DagNode, EdgeKind, NodeId, NodeKind};

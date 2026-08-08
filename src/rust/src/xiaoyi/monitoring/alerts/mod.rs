@@ -30,6 +30,7 @@ pub mod alert;
 pub mod channel;
 pub mod notifier;
 pub mod rule;
+pub mod sink;
 
 pub use alert::{Alert, AlertSeverity};
 pub use notifier::{AlertManager, Notifier};
