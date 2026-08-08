@@ -15,49 +15,42 @@ The Rust core is organized into deep vertical layers — each domain grows its o
 ```
 xiaoyi/
 ├── core/
-│   └── config/
-│       └── source/
-│           ├── env/
-│           ├── file/
-│           └── vault/
-│               ├── aes/
-│               ├── decrypt/
-│               ├── encrypt/
-│               └── key/
+│   ├── config/source/{env,file,vault/{aes,decrypt,encrypt,key}}
+│   ├── error/context
+│   └── result/{handler,status}
 ├── domain/
 │   └── token/
-│       ├── primitive/
-│       └── syntax/
+│       ├── primitive/{bool,bytes,float,int,string}
+│       └── syntax/{keyword,operator,punctuation}
 ├── workflow/
-│   └── dag/
-│       ├── graph/
-│       ├── node/
-│       └── edge/
+│   └── dag/{graph,node,edge}
 ├── memory/
-│   ├── stm/
-│   │   └── cache/
-│   └── ltm/
-│       ├── vector/
-│       └── graph/
+│   ├── stm/cache
+│   └── ltm/{vector,graph}
 ├── utils/
-│   ├── env/
-│   ├── fs/
-│   ├── id/
-│   ├── json/
-│   ├── math/
-│   ├── net/
-│   ├── retry/
-│   ├── string/
-│   ├── time/
-│   └── validation/
+│   ├── {env,fs,id,json,math,net,retry,string,time,validation}
 ├── builder/
+│   └── {ast,codegen,formatter,template,validator}
 ├── critic/
+│   └── {aggregator,cache/embedding,large_llm,model_router,rules/{style,security},small_llm}
 ├── evaluator/
+│   └── {analysis,benchmark,build/compiler,feedback,gates,sandbox/container,test/property}
 ├── gateway/
 ├── knowledge/
+│   ├── graph/repo/{commit,scanner}
+│   ├── retrieval/ranker
+│   ├── tools/openapi/{schema,schema_store}
+│   ├── tools/registry/discovery
+│   └── vector/store/{in_memory,remote}
 ├── monitoring/
+│   ├── alerts/{alert,channel,notifier,rule}
+│   ├── finops/{budget,cost,tracker}
+│   ├── metrics/{counter,gauge,histogram,registry}
+│   └── tracing/{context,exporter/{otlp,jaeger},sampler,span}
 ├── orchestrator/
+│   └── {loop_,monitor,planner,policy,recovery}
 └── resilience/
+    └── {bulkhead,circuit_breaker,fallback,health,retry,timeout,semaphore,isolation}
 ```
 
 Each slice owns its own helpers, tests, and docs.
